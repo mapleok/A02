@@ -1,0 +1,171 @@
+/* 引入基础 CSS 文件，可包含全局的字体、颜色等基础样式设置 */
+@import './base.css';
+@import './global.css';
+
+/* 应用根元素的样式设置 */
+#app {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 顶部导航栏的样式设置 */
+.top-nav-bar {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  transition: background-color 0.3s ease;
+}
+
+/* 鼠标悬停在顶部导航栏上时的样式设置 */
+.top-nav-bar:hover {
+  background-color: rgba(0, 0, 0, 0.9);
+}
+
+/* 顶部导航栏中 logo 的样式设置 */
+.logo {
+  font-size: 28px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  transition: color 0.3s ease;
+}
+
+/* 鼠标悬停在 logo 上时的样式设置 */
+.logo:hover {
+  color: #e0e0e0;
+}
+
+/* 导航链接容器的样式设置 */
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+/* 顶部导航栏中链接的样式设置 */
+.top-nav-link {
+  color: #ffffff;
+  display: block;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 18px;
+  margin-left: 20px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+/* 鼠标悬停在顶部导航栏链接上时的样式设置 */
+.top-nav-link:hover {
+  background-color: transparent;
+  font-weight: bold;
+  transform: translateY(-2px);
+}
+
+/* 顶部导航栏中激活链接（当前页面对应的链接）的样式设置 */
+.top-nav-link.router-link-active {
+  font-weight: bold;
+
+  background-color: #f0f0f0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 侧边栏导航链接的样式设置 */
+.sidebar-nav-link {
+  color: #777;
+  text-decoration: none;
+  font-size: 16px;
+  display: block;
+  padding: 12px 20px;
+  border-radius: 4px;
+  margin: 5px 10px;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+/* 鼠标悬停在侧边栏导航链接上时的样式设置 */
+/*.sidebar-nav-link:hover {*/
+/*  background-color: transparent;*/
+/*  font-weight: bold;*/
+/*  transform: translateX(5px);*/
+/*}*/
+
+/*/* 侧边栏导航中激活链接（当前页面对应的链接）的样式设置 */
+/*.sidebar-nav-link.router-link-active {*/
+/*  font-weight: bold;*/
+/*  font-size: 18px;*/
+/*  background-color: #f8f8f8;*/
+/*  box-shadow: inset 2px 0 4px rgba(0, 0, 0, 0.05);*/
+/*}*/
+
+li.el-menu-item {
+  color: #182716;
+  font-size: 16px;
+}
+
+/* 主内容区域的样式设置 */
+.main-content {
+  flex: 1;
+  background-color: #f9f9f9;
+  padding: 30px;
+}
+
+/* 响应式布局，当屏幕宽度小于等于 768px 时应用以下样式 */
+@media (max-width: 768px) {
+  /* 顶部导航栏的样式调整 */
+  .top-nav-bar {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px;
+  }
+
+  /* 导航链接容器的样式调整 */
+  .nav-links {
+    margin-top: 15px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* 顶部导航栏链接的样式调整 */
+  .top-nav-link {
+    margin-left: 0;
+    margin-bottom: 10px;
+  }
+
+  /* 侧边栏的样式调整 */
+  .sidebar {
+    min-width: auto;
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  /* 主内容区域的样式调整 */
+  .main-content {
+    padding: 15px;
+  }
+
+  /* 修改 ElementPlus 图标（el-icon）的样式 */
+  .el-icon {
+    font-size: 20px;
+    color: #0071e3;
+  }
+}
+
+/* 修改 ElementPlus 图标（el-icon）的样式 */
+.el-icon {
+  font-size: 20px;
+  color: #0071e3;
+  transition: color 0.3s ease;
+}
+
+/* 鼠标悬停在 ElementPlus 图标上时的样式设置 */
+.el-icon:hover {
+  color: #0056b3;
+}

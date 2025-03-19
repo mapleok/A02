@@ -1,0 +1,184 @@
+/* 定义来自 <https://github.com/vuejs/theme> 的颜色调色板 */
+:root {
+  /* 白色系 */
+  --vt-c-white: #ffffff;
+  --vt-c-white-soft: #f8f8f8;
+  --vt-c-white-mute: #f2f2f2;
+
+  /* 黑色系 */
+  --vt-c-black: #181818;
+  --vt-c-black-soft: #222222;
+  --vt-c-black-mute: #282828;
+
+  /* 其他颜色 */
+  --vt-c-indigo: #2c3e50;
+
+  /* 分隔线颜色 - 亮色模式 */
+  --vt-c-divider-light-1: rgba(60, 60, 60, 0.29);
+  --vt-c-divider-light-2: rgba(196, 36, 36, 0.35);
+
+  /* 分隔线颜色 - 暗色模式 */
+  --vt-c-divider-dark-1: rgba(84, 84, 84, 0.65);
+  --vt-c-divider-dark-2: rgba(84, 84, 84, 0.48);
+
+  /* 文本颜色 - 亮色模式 */
+  --vt-c-text-light-1: var(--vt-c-indigo);
+  --vt-c-text-light-2: rgba(60, 60, 60, 0.66);
+
+  /* 文本颜色 - 暗色模式 */
+  --vt-c-text-dark-1: var(--vt-c-white);
+  --vt-c-text-dark-2: rgba(235, 235, 235, 0.64);
+}
+
+/* 本项目的语义化颜色变量 */
+:root {
+  /* 背景颜色 */
+  --color-background: var(--vt-c-white);
+  --color-background-soft: var(--vt-c-white-soft);
+  --color-background-mute: var(--vt-c-white-mute);
+
+  /* 边框颜色 */
+  --color-border: var(--vt-c-divider-light-2);
+  --color-border-hover: var(--vt-c-divider-light-1);
+
+  /* 标题颜色 */
+  --color-heading: var(--vt-c-text-light-1);
+
+  /* 文本颜色 */
+  --color-text: var(--vt-c-text-light-1);
+
+  /* 节间距 */
+  --section-gap: 160px;
+}
+
+/* 当系统偏好深色模式时的颜色变量设置 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* 背景颜色 */
+    --color-background: var(--vt-c-black);
+    --color-background-soft: var(--vt-c-black-soft);
+    --color-background-mute: var(--vt-c-black-mute);
+
+    /* 边框颜色 */
+    --color-border: var(--vt-c-divider-dark-2);
+    --color-border-hover: var(--vt-c-divider-dark-1);
+
+    /* 标题颜色 */
+    --color-heading: var(--vt-c-text-dark-1);
+
+    /* 文本颜色 */
+    --color-text: var(--vt-c-text-dark-2);
+  }
+}
+
+/* 全局基础样式，设置所有元素及其伪元素的盒模型为 border-box，并初始化外边距和内边距 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 页面主体样式，设置字体、行高、文本颜色、背景颜色以及颜色和背景色变化的过渡效果 */
+body {
+  font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+  line-height: 1.6;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* 链接样式，设置默认文本颜色和鼠标悬停时的颜色变化过渡效果 */
+a {
+  color: #0071e3;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+/* 标题样式，设置标题文本颜色和底部外边距 */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-heading);
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+
+/* 列表样式，去除列表默认的项目符号 */
+ul, ol {
+  list-style: none;
+}
+
+/* 侧边栏整体样式，设置背景色、阴影和顶部内边距 */
+.sidebar {
+  background-color: var(--color-background-soft);
+  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  padding-top: 20px;
+}
+
+/* 侧边栏菜单样式，去除右侧边框 */
+.sidebar.el-menu {
+  border-right: none;
+}
+
+/* 侧边栏菜单项和子菜单标题样式，设置文本颜色、字体大小和内边距 */
+.sidebar.el-menu-item,
+.sidebar.el-sub-menu__title {
+  color: var(--color-text);
+  font-size: 16px;
+  padding: 10px 20px;
+  transition: color 0.3s ease;
+}
+
+/* 侧边栏选中菜单项和激活子菜单标题样式，设置背景透明、文本颜色和加粗效果 */
+.sidebar.el-menu-item.is-active,
+.sidebar.el-sub-menu.is-active > .el-sub-menu__title {
+  background-color: transparent!important;
+  color: #0071e3;
+  font-weight: 600;
+}
+
+/* 侧边栏激活链接样式，设置文本颜色和加粗效果 */
+.sidebar.sidebar-nav-link.router-link-active {
+  color: #0071e3!important;
+  font-weight: 600!important;
+}
+
+/* 侧边栏链接鼠标悬停样式，设置背景透明和文本颜色 */
+.sidebar.sidebar-nav-link:hover {
+  background-color: transparent;
+  color: #0071e3;
+}
+
+/* 侧边栏子菜单箭头样式，设置箭头颜色 */
+.sidebar.el-sub-menu__icon-arrow {
+  color: #999!important;
+}
+
+/* 按钮样式，设置背景色、边框、文本颜色、圆角、内边距、外边距和过渡效果 */
+.el-button {
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  color: #333;
+  border-radius: 6px;
+  padding: 8px 16px;
+  margin-right: 10px;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+}
+
+/* 按钮鼠标悬停样式，设置背景色和边框颜色变化 */
+.el-button:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+
+:root {
+  --color-primary: #0071e3;
+  --color-secondary: #7c9f4a;
+  --color-text: #1d1d1f;
+  --color-background: #fafafa;
+}
