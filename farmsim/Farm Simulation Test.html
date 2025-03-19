@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>农业模拟系统测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>农业模拟系统测试页面</h1>
+
+        <!-- 用户输入表单 -->
+        <div class="form-group">
+            <label for="prompt">输入问题（可选）：</label>
+            <textarea id="prompt" rows="3" placeholder="请输入您的问题..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="cropType">作物类型（可选）：</label>
+            <input type="text" id="cropType" placeholder="例如：小麦">
+        </div>
+
+        <div class="form-group">
+            <label for="targetYield">目标产量（可选）：</label>
+            <input type="text" id="targetYield" placeholder="例如：500">
+        </div>
+
+        <button onclick="submitRequest()">提交</button>
+
+        <!-- 展示 Agent 的决策结果 -->
+        <div class="response">
+            <h2>Agent 决策结果：</h2>
+            <pre id="responseOutput">等待结果...</pre>
+        </div>
+    </div>
+
+    <script>
+        // 提交请求的函数
+        function submitRequest() {
+            const prompt = document.getElementById('prompt').value;
+            const cropType = document.getElementById('cropType').value;
+            const targetYield = document.getElementById('targetYield').value;
+
+            // 构建请求体
+            const requestBody = {};
+            if (prompt) {
+                requestBody.prompt = prompt;
+            }
+            if (cropType && targetYield) {
+                requestBody.goal = {
+                    cropType: cropType,
+                    targetYield: parseFloat(targetYield)
+                };
+            }
+
+            // 发送请求
+            fetch('http://localhost:8080/api/glm/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestBody)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    // 展示结果
+                    document.getElementById('responseOutput').textContent = JSON.stringify(data, null, 2);
+                })
+                .catch(error => {
+                    console.error('请求失败：', error);
+                    document.getElementById('responseOutput').textContent = '请求失败，请检查控制台日志。';
+                });
+        }
+    </script>
+</body>
+
+</html>
