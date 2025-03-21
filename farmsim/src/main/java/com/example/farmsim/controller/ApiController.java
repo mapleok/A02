@@ -1,11 +1,14 @@
 package com.example.farmsim.controller;
 
 import com.example.farmsim.model.dto.*;
-import com.example.farmsim.model.entity.Agent;
 import com.example.farmsim.model.entity.AgentDialogue;
-import com.example.farmsim.model.entity.Simulation;
-import com.example.farmsim.repository.AgentRepo;
-import com.example.farmsim.repository.SimulationRepo;
+import com.example.farmsim.model.entity.Crop;
+import com.example.farmsim.model.entity.Environment;
+import com.example.farmsim.model.entity.RevenueRecord;
+import com.example.farmsim.repository.CropRepo;
+import com.example.farmsim.repository.EnvironmentRepo;
+import com.example.farmsim.repository.RevenueRecordRepo;
+
 import com.example.farmsim.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,12 +19,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.example.farmsim.service.AgentDialogueService;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 @RestController
 @RequestMapping("/api")
@@ -42,13 +43,13 @@ public class ApiController {
     private AgentDialogueService agentDialogueService;
 
     @Autowired
-    private AgentRepo agentRepo;
+    private RevenueRecordRepo revenueRecordRepo;
 
     @Autowired
-    private SimulationRepo simulationRepo;
+    private EnvironmentRepo environmentRepo;
 
     @Autowired
-    private GLMService glmService;
+    private CropRepo cropRepo;
 
     // 创建模拟
     @PostMapping("/simulation")
@@ -137,6 +138,25 @@ public class ApiController {
         return agentService.startDialogue(simulationId, request.get("prompt"));
     }
 
+    // EnvironmentController.java
+    @PostMapping("/random-weather/{simulationId}")
+    public ResponseEntity<String> randomizeWeather(@PathVariable String simulationId) {
+        Environment latestEnv = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+
+        // 实现随机变化逻辑（示例）
+        latestEnv.setTemperature(latestEnv.getTemperature() + (Math.random() * 4 - 2));
+        latestEnv.setPrecipitation(latestEnv.getPrecipitation() + (Math.random() * 20 - 10));
+        latestEnv.setSoilFertility(latestEnv.getSoilFertility() + (Math.random() * 0.1 - 0.05));
+
+        // 约束取值范围
+        latestEnv.setTemperature(Math.max(-50, Math.min(50, latestEnv.getTemperature())));
+        latestEnv.setPrecipitation(Math.max(0, latestEnv.getPrecipitation()));
+        latestEnv.setSoilFertility(Math.max(0, Math.min(1, latestEnv.getSoilFertility())));
+
+        environmentRepo.save(latestEnv);
+        return ResponseEntity.ok("天气已随机更新");
+    }
+
     @PostMapping("/agent/decision")
     public ResponseEntity<?> makeAgentDecision(
             @RequestParam String agentId,
@@ -160,7 +180,35 @@ public class ApiController {
         return ResponseEntity.ok(response);
     }
 
-    // 创建环境
+    @GetMapping("/simulation/{simulationId}/revenue-comparison")
+    public ResponseEntity<Map<String, Double>> getRevenueComparison(@PathVariable String simulationId) {
+        List<RevenueRecord> records = revenueRecordRepo.findBySimulationId(simulationId);
+
+        double beforeExpert = records.stream()
+                .filter(r -> !r.isExpertModeEnabled())
+                .mapToDouble(RevenueRecord::getRevenue)
+                .average().orElse(0);
+
+        double afterExpert = records.stream()
+                .filter(r -> r.isExpertModeEnabled())
+                .mapToDouble(RevenueRecord::getRevenue)
+                .average().orElse(0);
+
+        Map<String, Double> result = new HashMap<>();
+        result.put("beforeExpert", beforeExpert);
+        result.put("afterExpert", afterExpert);
+        return ResponseEntity.ok(result);
+    }
+
+
+    @PostMapping("/simulation/{simulationId}/enable-expert-mode")
+    public ResponseEntity<String> enableExpertMode(@PathVariable String simulationId) {
+        agentService.createAgronomist(simulationId);
+        agentService.triggerAgentDialogue(simulationId); // 新增：触发对话
+        return ResponseEntity.ok("农业专家模式已开启，对话已触发");
+    }
+
+
     @PostMapping("/environment")
     public ResponseEntity<Map<String, String>> createEnvironment(@RequestBody EnvironmentDTO dto) {
         Long environmentId = environmentService.createEnvironment(dto);
@@ -169,6 +217,13 @@ public class ApiController {
         response.put("message", "Environment created successfully");
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/crops")
+    public ResponseEntity<List<Crop>> getCropsBySimulationId(@RequestParam String simulationId) {
+        List<Crop> crops = cropRepo.findBySimulationId(simulationId);
+        return ResponseEntity.ok(crops);
+    }
+
 
     @GetMapping("/simulation/{id}/dialogue-history")
     public ResponseEntity<List<AgentDialogue>> getDialogueHistory(@PathVariable String id) {

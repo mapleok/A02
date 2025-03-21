@@ -1,69 +1,58 @@
-// src/api/index.js
 import axios from 'axios';
 
-// 创建 axios 实例
-const service = axios.create({
-  baseURL: 'http://localhost:8080', // 替换为你的后端 API 基础地址
-  timeout: 5000 // 请求超时时间
-});
+const API_BASE = 'http://localhost:8080/api';
 
-// 请求拦截器
-service.interceptors.request.use(
-  config => {
-    // 在发送请求之前做些什么，例如添加请求头
-    return config;
-  },
-  error => {
-    // 处理请求错误
-    console.log(error);
-    return Promise.reject(error);
-  }
-);
-
-// 响应拦截器
-service.interceptors.response.use(
-  response => {
-    // 对响应数据做点什么
+// 通用请求方法
+const callApi = async (endpoint, method, body) => {
+  try {
+    const response = await axios({
+      url: `${API_BASE}${endpoint}`,
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      data: body
+    });
     return response.data;
-  },
-  error => {
-    // 处理响应错误
-    console.log('err' + error);
-    return Promise.reject(error);
+  } catch (error) {
+    return { error: error.message };
   }
-);
-
-// 封装创建模拟接口
-export const createSimulation = (data) => {
-  return service({
-    url: '/api/simulation',
-    method: 'post',
-    data
-  });
 };
 
-// 封装创建 Agent 接口
-export const createAgent = (data) => {
-  return service({
-    url: '/api/agent',
-    method: 'post',
-    data
-  });
+
+// 启动对话
+export const startDialogue = async (simulationId, prompt) => {
+  return callApi(`/simulation/${simulationId}/start-dialogue`, 'POST', { prompt });
 };
 
-// 封装创建作物接口
-export const createCrop = (data) => {
-  return service({
-    url: '/api/crop',
-    method: 'post',
-    data
-  });
+// 获取收成数据
+export const getHarvestData = async (simulationId) => {
+  try {
+    const response = await axios.get(`${API_BASE}/harvest/${simulationId}`);
+    return response.data;
+  } catch (error) {
+    return { error: error.message };
+  }
 };
 
-// 封装获取环境数据接口
-export const getLatestEnvironment = () => {
-  return service({
-    url: '/api/environment',
-    method: 'get'
-  });
+export const createAgent = (agentData) => {
+  // 函数逻辑
+  return fetch('/api/agent', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(agentData)
+  })
+    .then(response => response.json());
+};
+
+export const createCrop = (cropData) => {
+  // 函数逻辑
+  return fetch('/api/crop', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(cropData)
+  })
+    .then(response => response.json());
 };

@@ -90,15 +90,6 @@ body {
 }
 
 /* 链接样式，设置默认文本颜色和鼠标悬停时的颜色变化过渡效果 */
-a {
-  color: #0071e3;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-a:hover {
-  color: #0056b3;
-}
 
 /* 标题样式，设置标题文本颜色和底部外边距 */
 h1, h2, h3, h4, h5, h6 {
@@ -116,7 +107,6 @@ ul, ol {
 .sidebar {
   background-color: var(--color-background-soft);
   box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  padding-top: 20px;
 }
 
 /* 侧边栏菜单样式，去除右侧边框 */
@@ -133,13 +123,6 @@ ul, ol {
   transition: color 0.3s ease;
 }
 
-/* 侧边栏选中菜单项和激活子菜单标题样式，设置背景透明、文本颜色和加粗效果 */
-.sidebar.el-menu-item.is-active,
-.sidebar.el-sub-menu.is-active > .el-sub-menu__title {
-  background-color: transparent!important;
-  color: #0071e3;
-  font-weight: 600;
-}
 
 /* 侧边栏激活链接样式，设置文本颜色和加粗效果 */
 .sidebar.sidebar-nav-link.router-link-active {
@@ -147,11 +130,6 @@ ul, ol {
   font-weight: 600!important;
 }
 
-/* 侧边栏链接鼠标悬停样式，设置背景透明和文本颜色 */
-.sidebar.sidebar-nav-link:hover {
-  background-color: transparent;
-  color: #0071e3;
-}
 
 /* 侧边栏子菜单箭头样式，设置箭头颜色 */
 .sidebar.el-sub-menu__icon-arrow {
@@ -178,7 +156,7 @@ ul, ol {
 
 :root {
   --color-primary: #0071e3;
-  --color-secondary: #7c9f4a;
-  --color-text: #1d1d1f;
+  --color-secondary: #3bc2b2;
+  --color-text: #000000;
   --color-background: #fafafa;
 }

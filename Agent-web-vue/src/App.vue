@@ -5,10 +5,14 @@
     <div class="sidebar-main-container">
       <!-- 引入侧边栏组件 -->
       <SideBar />
-      <!-- 主内容区域，用于显示路由匹配的组件 -->
+<!--       主内容区域，用于显示路由匹配的组件-->
       <main class="main-content">
-        <router-view />
+        <router-view></router-view>
       </main>
+<!--      //可以考虑动画的淡入淡出效果-->
+<!--      <transition name="fade">-->
+<!--        <router-view></router-view>-->
+<!--      </transition>-->
     </div>
   </div>
 </template>
@@ -20,6 +24,7 @@ import TopNavBar from './components/link/TopNavBar.vue'
 import SideBar from './components/link/SideBar.vue'
 // 引入 Vue Router 的 RouterView 组件
 import { RouterView } from 'vue-router'
+
 </script>
 
 <style scoped>
@@ -32,4 +37,12 @@ import { RouterView } from 'vue-router'
   flex: 1;
   padding: 20px;
 }
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
 </style>

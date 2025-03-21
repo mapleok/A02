@@ -13,7 +13,7 @@
       <router-link to="/data-visualization" class="top-nav-link">
         <i class="fas fa-chart-bar"></i> 数据可视化
       </router-link>
-      <router-link to="/websocket" class="top-nav-link">
+      <router-link to="/person" class="top-nav-link">
         <i class="fas fa-user"></i> 个人中心
       </router-link>
     </div>

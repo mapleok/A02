@@ -70,5 +70,4 @@ public class GLMService {
             throw new RuntimeException("Failed to call GLM API", e);
         }
     }
-
 }

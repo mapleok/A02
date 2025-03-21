@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -22,6 +23,14 @@ public class Agent {
     @MapKeyColumn(name = "property_key")
     @Column(name = "property_value")
     private Map<String, String> properties;
+
+    private double plantingSkill;
+    private double learningAbility;
+    private double localKnowledge;
+
+    @ElementCollection
+    @CollectionTable(name = "agent_accessible_data")
+    private List<String> accessibleData;
 
     // 关联的模拟
     @Setter

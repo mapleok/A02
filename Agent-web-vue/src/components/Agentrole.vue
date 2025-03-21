@@ -1,22 +1,19 @@
 <template>
-  <div class="multi-agent-farm-simulation">
+
     <!-- 整体容器，使用 flex 布局实现横行布局 -->
-    <div class="row-layout">
+    
       <div class="left-column">
         <div class="agent-cards">
           <!-- Agent 1 -->
           <div class="agent-card">
-            <h3>Agent 1 - 农场种植规划 Agent</h3>
+            <h3>Agent 1</h3>
             <div class="input-group inline-input-group">
               <label for="agent1-name">名称</label>
-              <el-input v-model="agent1Name" placeholder="例如：智能种植规划 Agent" />
+              <el-input v-model="agent1Name" />
             </div>
             <div class="input-group inline-input-group">
               <label for="agent1-role">角色</label>
-              <el-input
-                v-model="agent1Role"
-                placeholder="例如：根据农场土地情况和市场需求，制定种植计划"
-              />
+              <el-input v-model="agent1Role" />
             </div>
             <div class="input-group inline-input-group">
               <label for="agent1-count">数量</label>
@@ -32,17 +29,14 @@
           </div>
           <!-- Agent 2 -->
           <div class="agent-card">
-            <h3>Agent 2 - 农场养殖管理 Agent</h3>
+            <h3>Agent 2</h3>
             <div class="input-group inline-input-group">
               <label for="agent2-name">名称</label>
-              <el-input v-model="agent2Name" placeholder="例如：智能养殖管理 Agent" />
+              <el-input v-model="createCrop" placeholder="你好" />
             </div>
             <div class="input-group inline-input-group">
               <label for="agent2-role">角色</label>
-              <el-input
-                v-model="agent2Role"
-                placeholder="例如：负责农场养殖动物的日常管理和疾病防控"
-              />
+              <el-input v-model="agent2Role" placeholder="" />
             </div>
             <div class="input-group inline-input-group">
               <label for="agent2-count">数量</label>
@@ -56,7 +50,9 @@
               </el-select>
             </div>
           </div>
-          <!-- Agent 3 -->
+
+
+
           <!-- 随机生成 Agent 角色 1 -->
           <div class="agent-card random-agent-generation">
             <h3>随机生成 Agent 角色 1</h3>
@@ -93,21 +89,18 @@
         <!-- 农业智能体和作物管理 -->
         <div class="agent-card random-agent-generation">
           <div class="agent-card">
-            <h3>Agent 3 - 农场销售推广 Agent</h3>
+            <h3>Agent 3 </h3>
             <div class="input-group inline-input-group">
               <label for="agent3-name">名称</label>
-              <el-input v-model="agent3Name" placeholder="例如：智能销售推广 Agent" />
+              <el-input v-model="agent3Name"/>
             </div>
             <div class="input-group inline-input-group">
               <label for="agent3-role">角色</label>
-              <el-input
-                v-model="agent3Role"
-                placeholder="例如：通过各种渠道推广农场产品，提高销售额"
-              />
+              <el-input v-model="agent3Role"/>
             </div>
             <div class="input-group inline-input-group">
               <label for="agent3-count">数量</label>
-              <el-select v-model="agent3Count" placeholder="请选择">
+              <el-select v-model="agent3Count">
                 <el-option
                   v-for="count in agentCountOptions"
                   :key="count"
@@ -118,60 +111,176 @@
             </div>
           </div>
         </div>
-      </div>
-      <div class="right-section">
-        <div class="agent-card random-agent-generation">
-          <div class="agent-card">
-            <h3>🤖 农业智能体</h3>
-            <div class="btn-group">
-              <div class="input-group inline-input-group">
-                <label for="agent3-name">名称</label>
-                <el-input v-model="agent3Name" placeholder="例如：智能销售推广 Agent" />
-              </div>
-              <div class="input-group inline-input-group">
-                <label for="agent3-role">角色</label>
-                <el-input
-                  v-model="agent3Role"
-                  placeholder="例如：通过各种渠道推广农场产品，提高销售额"
-                />
-              </div>
-              <div class="input-group inline-input-group">
-                <label for="agent3-count">数量</label>
-                <el-select v-model="agent3Count" placeholder="请选择">
-                  <el-option
-                    v-for="count in agentCountOptions"
-                    :key="count"
-                    :label="count"
-                    :value="count"
-                  />
-                </el-select>
-              </div>
-            </div>
-          </div>
 
-          <div class="agent-card random-agent-generation">
-            <div class="agent-card">
-              <h3>🌱 作物管理</h3>
-            </div>
-            <div class="btn-group">
-              <!-- 创建作物（对应新增作物） -->
-              <button @click="handleCreateCrop">新增作物</button>
-              <button class="btn btn-sm btn-primary" @click="showAddCropModal">🌾 新增作物</button>
-              <button class="btn btn-sm btn-warning" @click="refreshCropStatus">🔄 刷新状态</button>
-              <button class="btn btn-sm btn-info" @click="showUpdateCropStatusModal">
-                🌱 更新状态
-              </button>
+        <!-- 统一创建智能体按钮 -->
+        <div class="create-agent-btn-container">
+          <button @click="createAgent" class="generate-button">创建</button>
+          <pre>{{ agentResult }}</pre>
+        </div>
+      </div>
+
+      <div class="agent-card random-agent-generation">
+        <h3>启动对话</h3>
+        <div class="agent-card">
+          <div class="input-group inline-input-group">
+          <label for="dialoguePrompt">对话提示</label>
+          <input type="text" id="dialoguePrompt" placeholder="输入对话提示">
+          <button onclick="startDialogue()" class="generate-button">启动对话</button>
+
+    <button @click="showAgentConversation" class="generate-button">查看 Agent 对话记录</button>
+          </div>
+    <div v-if="showConversation" class="input-container">
+      <div class="input-group">
+        <div class="input-item">
+          <h3 class="subsection-title">查询条件</h3>
+          <el-input
+            v-model="query"
+            clearable
+            placeholder="输入查询条件"
+            class="el-input-field"
+          />
+        </div>
+        <div class="input-item">
+          <el-button @click="fetchAgentConversation" class="action-button">查询</el-button>
+        </div>
+      </div>
+      <div class="input-group">
+        <div class="input-item">
+          <h3 class="subsection-title">Agent 对话记录</h3>
+          <div class="agent-card">
+            <div class="input-group inline-input-group">
+              <input type="text" id="simulationIdForHistory" placeholder="输入场景名称">
+              <button onclick="getDialogueHistory()" class="generate-button">获取历史</button>
             </div>
           </div>
+          <el-input
+            type="textarea"
+            v-model="conversationContent"
+            :rows="10"
+            readonly
+            placeholder="这里将显示 agent 互相对话的内容"
+            class="el-input-field"
+          />
         </div>
       </div>
     </div>
-    <!-- 统一创建智能体按钮 -->
-    <div class="create-agent-btn-container">
-      <button @click="handleCreateAllAgents" class="generate-button">确定</button>
-    </div>
   </div>
+      </div>
+
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+// Agent 1 相关数据
+const agent1Name = ref('')
+const agent1Role = ref('')
+const agent1Count = ref('')
+
+// Agent 2 相关数据
+const agent2Role = ref('')
+const agent2Count = ref('')
+
+const agent3Name = ref('')
+const agent3Role = ref('')
+const agent3Count = ref('')
+// 可选择的 Agent 数量选项
+const agentCountOptions = [1, 2, 3, 4, 5]
+
+// 创建Agent
+// 添加 simulationId 的响应式变量
+const simulationId = ref('');
+
+const showConversation = ref(false);
+const query = ref('');
+const conversationContent = ref('');
+async function createAgent() {
+  const result = await callApi('/agent', 'POST', {
+    agentName: agent1Name.value,
+    simulationId: simulationId.value, // 使用响应式变量
+    roleType: agent1Role.value,
+  })
+  agentResult.value = JSON.stringify(result, null, 2)
+}
+
+
+// 启动对话
+async function startDialogue() {
+  const simulationId = document.getElementById("simulationIdForDialogue").value;
+  const prompt = document.getElementById("dialoguePrompt").value;
+  const response = await fetch(`${baseUrl}/simulation/${simulationId}/start-dialogue`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ prompt })
+  });
+  const data = await response.json();
+  document.getElementById("startDialogueResponse").innerText = JSON.stringify(data, null, 2);
+}
+
+// 获取对话历史
+async function getDialogueHistory() {
+  const simulationId = document.getElementById("simulationIdForHistory").value;
+  const response = await fetch(`${baseUrl}/simulation/${simulationId}/dialogue-history`);
+  const data = await response.json();
+  document.getElementById("dialogueHistoryResponse").innerText = JSON.stringify(data, null, 2);
+}
+
+
+const showAgentConversation = () => {
+  showConversation.value = !showConversation.value;
+};
+
+const fetchAgentConversation = () => {
+  // 查询 Agent 对话记录的逻辑
+};
+
+const agentResult = ref('')
+
+// 随机生成的 Agent 1
+const randomAgent1 = ref(null)
+
+// 随机生成的 Agent 2
+const randomAgent2 = ref(null)
+
+// 随机生成 Agent 角色 1 的函数
+const generateRandomAgent1 = () => {
+  const agentNames = ['智能灌溉 Agent', '土壤改良 Agent', '气象预报 Agent', '作物保护 Agent']
+  const agentRoles = [
+    '根据土壤湿度数据，精准灌溉',
+    '定期改良土壤的结构和肥力',
+    '实时预报气象变化，为农场生产提供参考',
+    '分析作物病虫害情况，采取相应的防治措施',
+  ]
+  const randomName = agentNames[Math.floor(Math.random() * agentNames.length)]
+  const randomRole = agentRoles[Math.floor(Math.random() * agentRoles.length)]
+  const randomCount = agentCountOptions[Math.floor(Math.random() * agentCountOptions.length)]
+  randomAgent1.value = {
+    name: randomName,
+    role: randomRole,
+    count: randomCount,
+  }
+}
+
+// 随机生成 Agent 角色 2 的函数
+const generateRandomAgent2 = () => {
+  const agentNames = ['农产品加工 Agent', '农场物流 Agent', '农场财务 Agent', '农场市场分析 Agent']
+  const agentRoles = [
+    '负责农产品的加工和包装',
+    '管理农场的物流运输，确保农产品及时送达',
+    '进行农场的财务管理，控制成本和预算',
+    '分析市场需求和趋势，为农场生产提供决策依据',
+  ]
+  const randomName = agentNames[Math.floor(Math.random() * agentNames.length)]
+  const randomRole = agentRoles[Math.floor(Math.random() * agentRoles.length)]
+  const randomCount = agentCountOptions[Math.floor(Math.random() * agentCountOptions.length)]
+  randomAgent2.value = {
+    name: randomName,
+    role: randomRole,
+    count: randomCount,
+  }
+}
+
+</script>
 
 <style scoped>
 /* 移除与全局样式冲突的按钮样式等 */
@@ -182,7 +291,9 @@
   color: #333;
   font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
 }
-
+.h3{
+  text-align: left;
+}
 .row-layout {
   display: flex; /* 使用 flex 布局 */
   gap: 20px; /* 两栏之间的间距 */
@@ -334,87 +445,3 @@ button:hover {
   background: #45a049;
 }
 </style>
-
-<script setup>
-import { ref } from 'vue'
-// import { createSimulation, createAgent, createCrop } from '../api'
-
-// Agent 1 相关数据
-const agent1Name = ref('')
-const agent1Role = ref('')
-const agent1Count = ref('')
-
-// Agent 2 相关数据
-const agent2Name = ref('')
-const agent2Role = ref('')
-const agent2Count = ref('')
-
-// Agent 3 相关数据
-const agent3Name = ref('')
-const agent3Role = ref('')
-const agent3Count = ref('')
-
-// 可选择的 Agent 数量选项
-const agentCountOptions = [1, 2, 3, 4, 5]
-
-// 随机生成的 Agent 1
-const randomAgent1 = ref(null)
-
-// 随机生成的 Agent 2
-const randomAgent2 = ref(null)
-
-// 随机生成 Agent 角色 1 的函数
-const generateRandomAgent1 = () => {
-  const agentNames = ['智能灌溉 Agent', '土壤改良 Agent', '气象预报 Agent', '作物保护 Agent']
-  const agentRoles = [
-    '根据土壤湿度数据，精准灌溉',
-    '定期改良土壤的结构和肥力',
-    '实时预报气象变化，为农场生产提供参考',
-    '分析作物病虫害情况，采取相应的防治措施',
-  ]
-  const randomName = agentNames[Math.floor(Math.random() * agentNames.length)]
-  const randomRole = agentRoles[Math.floor(Math.random() * agentRoles.length)]
-  const randomCount = agentCountOptions[Math.floor(Math.random() * agentCountOptions.length)]
-  randomAgent1.value = {
-    name: randomName,
-    role: randomRole,
-    count: randomCount,
-  }
-}
-
-// 随机生成 Agent 角色 2 的函数
-const generateRandomAgent2 = () => {
-  const agentNames = ['农产品加工 Agent', '农场物流 Agent', '农场财务 Agent', '农场市场分析 Agent']
-  const agentRoles = [
-    '负责农产品的加工和包装',
-    '管理农场的物流运输，确保农产品及时送达',
-    '进行农场的财务管理，控制成本和预算',
-    '分析市场需求和趋势，为农场生产提供决策依据',
-  ]
-  const randomName = agentNames[Math.floor(Math.random() * agentNames.length)]
-  const randomRole = agentRoles[Math.floor(Math.random() * agentRoles.length)]
-  const randomCount = agentCountOptions[Math.floor(Math.random() * agentCountOptions.length)]
-  randomAgent2.value = {
-    name: randomName,
-    role: randomRole,
-    count: randomCount,
-  }
-}
-
-// 创建作物
-const handleCreateCrop = async () => {
-  try {
-    // 这里假设需要一个单独的作物名称输入框，目前代码中没有，可根据实际情况调整
-    const cropNameInput = '作物名称' // 可替换为实际输入框的值
-    const data = {
-      cropName: cropNameInput,
-      growthRate: 1.0,
-    }
-    const result = await createCrop(data)
-    cropResult.value = `作物 ID: ${result.id}`
-  } catch (error) {
-    console.error('创建作物失败:', error)
-    cropResult.value = '创建作物失败，请稍后重试'
-  }
-}
-</script>

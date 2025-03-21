@@ -32,17 +32,10 @@
 </template>
 
 <script setup>
-import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 </script>
 
 <style scoped>
-/* 移除与全局样式冲突的部分 */
-/* body {
-  font-family: Arial, sans-serif;
-  background-color: #fafafa;
-  margin: 0;
-} */
 
 /* 页面标题样式 */
 .page-title {

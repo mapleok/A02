@@ -1,9 +1,14 @@
+<template>
+  <div>
+    <h1>Home Page</h1>
+    <p>Welcome to the home page!</p>
+  </div>
+</template>
+
 <script setup>
-import TheWelcome from '../components/WelcomeItem.vue'
+// 这里可以添加 Home 页面的逻辑
 </script>
 
-<template>
-  <main>
-    <TheWelcome />
-  </main>
-</template>
+<style scoped>
+/* 这里可以添加 Home 页面的样式 */
+</style>

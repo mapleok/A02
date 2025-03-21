@@ -3,12 +3,15 @@ package com.example.farmsim.service;
 import com.example.farmsim.model.dto.HarvestDTO;
 import com.example.farmsim.model.dto.HarvestResponseDTO;
 import com.example.farmsim.model.entity.Harvest;
+import com.example.farmsim.model.entity.RevenueRecord;
 import com.example.farmsim.model.entity.Simulation;
 import com.example.farmsim.repository.HarvestRepo;
+import com.example.farmsim.repository.RevenueRecordRepo;
 import com.example.farmsim.repository.SimulationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,6 +23,9 @@ public class HarvestService {
 
     @Autowired
     private SimulationRepo simulationRepo;
+
+    @Autowired
+    private RevenueRecordRepo revenueRecordRepo;
 
     // 保存收成数据
     public Long saveHarvest(HarvestDTO dto) {
@@ -38,6 +44,18 @@ public class HarvestService {
         // 3. 保存数据
         harvestRepo.save(harvest);
         return harvest.getId();
+    }
+
+    public void calculateRevenue(String simulationId, boolean expertModeEnabled) {
+        List<Harvest> harvests = harvestRepo.findBySimulationId(simulationId);
+        double totalRevenue = harvests.stream().mapToDouble(h -> h.getYield() * h.getQuality()).sum();
+
+        RevenueRecord record = new RevenueRecord();
+        record.setSimulationId(simulationId);
+        record.setRevenue(totalRevenue);
+        record.setExpertModeEnabled(expertModeEnabled);
+        record.setTimestamp(LocalDateTime.now());
+        revenueRecordRepo.save(record);
     }
 
     // 查询指定模拟的收成数据

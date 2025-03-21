@@ -120,9 +120,6 @@ const handleMenuSelect = (index, indexPath) => {
 .sidebar {
   min-width: 100px;
   height: 100vh;
-  background-color: var(--color-background);
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
-  padding-top: 20px;
 }
 
 .sidebar-icon-text {
@@ -132,6 +129,7 @@ const handleMenuSelect = (index, indexPath) => {
   color: var(--color-text);
   font-size: 16px;
 }
+
 
 .sidebar-nav-link {
   color: var(--color-text);
@@ -143,20 +141,13 @@ const handleMenuSelect = (index, indexPath) => {
 }
 
 .sidebar-nav-link:hover {
-  background-color: #e0f2c1;
-  color: #555;
+  background-color: rgba(255, 255, 255, 0);
+
 }
 
 .sidebar-nav-link.router-link-active {
-  background-color: #c3d1a5;
-  color: #222;
+
   font-weight: bold;
 }
 
-/* 点击效果 */
-.active-effect {
-  color: #ff6347;
-  text-decoration: underline;
-  transition: color 0.3s ease, text-decoration 0.3s ease;
-}
 </style>

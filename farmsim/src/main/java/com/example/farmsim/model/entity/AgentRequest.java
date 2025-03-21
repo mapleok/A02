@@ -5,7 +5,6 @@ import lombok.Setter;
 
 import java.util.Map;
 
-// src/main/java/com/example/farmsim/model/dto/AgentRequest.java
 @Getter
 @Setter
 public class AgentRequest {

@@ -11,7 +11,7 @@
  Target Server Version : 80040 (8.0.40)
  File Encoding         : 65001
 
- Date: 17/03/2025 18:15:29
+ Date: 19/03/2025 15:53:23
 */
 
 SET NAMES utf8mb4;
@@ -66,6 +66,43 @@ INSERT INTO `agent` VALUES ('AGENT-1742042128014', 'Adam', NULL, 'FARMER', 'SIM-
 INSERT INTO `agent` VALUES ('AGENT-1742042289759', 'Adam', NULL, 'FARMER', 'SIM-1742042280240', NULL);
 INSERT INTO `agent` VALUES ('AGENT-1742129348317', '老王', NULL, 'FARMER', 'SIM-1742129341880', NULL);
 INSERT INTO `agent` VALUES ('AGENT-1742129577541', '老王', NULL, 'FARMER', 'SIM-1742129571107', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742212594705', 'Watt55', NULL, 'FARMER', 'SIM-1742212589133', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742214770582', 'Watt55', NULL, 'FARMER', 'SIM-1742214765033', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742216020483', 'Watt55', NULL, 'FARMER', 'SIM-1742214765033', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742216028424', 'Water', NULL, 'FARMER', 'SIM-1742216014669', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742216030340', 'Water', NULL, 'FARMER', 'SIM-1742216014669', NULL);
+INSERT INTO `agent` VALUES ('AGENT-1742370285758', '气象学家李四', NULL, 'FARMER', 'SIM-1742042280240', NULL);
+
+-- ----------------------------
+-- Table structure for agent_command
+-- ----------------------------
+DROP TABLE IF EXISTS `agent_command`;
+CREATE TABLE `agent_command`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `action` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `parameters` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `target` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `timestamp` datetime(6) NULL DEFAULT NULL,
+  `simulation_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FKbfwasnj3js896520utyxqlghp`(`simulation_id` ASC) USING BTREE,
+  CONSTRAINT `FKbfwasnj3js896520utyxqlghp` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of agent_command
+-- ----------------------------
+INSERT INTO `agent_command` VALUES (1, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":300},\"timestamp\":\"2025-03-17T20:56:51.123266200\"}', NULL, '2025-03-17 20:56:51.125270', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (2, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":300,\"irrigationType\":\"drip\"},\"timestamp\":\"2025-03-17T20:57:00.325043300\"}', NULL, '2025-03-17 20:57:00.326044', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (3, 'plant', '{\"action\":\"plant\",\"target\":\"field-2\",\"parameters\":{\"cropType\":\"wheat\",\"variety\":\"drought-resistant\",\"plantingDensity\":250,\"irrigationSchedule\":{\"start\":\"2023-04-15\",\"end\":\"2023-05-15\",\"interval\":5,\"duration\":1.5}},\"timestamp\":\"2025-03-17T20:57:05.273734\"}', NULL, '2025-03-17 20:57:05.274734', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (4, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":3,\"waterAmount\":300,\"irrigationMethod\":\"drip\"},\"timestamp\":\"2025-03-17T21:04:05.691058400\"}', NULL, '2025-03-17 21:04:05.691058', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (5, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":300},\"timestamp\":\"2025-03-17T21:04:29.936496700\"}', NULL, '2025-03-17 21:04:29.936497', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (6, 'plant', '{\"action\":\"plant\",\"target\":\"field-2\",\"parameters\":{\"cropType\":\"wheat\",\"variety\":\"drought-resistant\",\"plantingDensity\":250,\"irrigationSchedule\":{\"start\":\"2023-04-15\",\"interval\":7,\"duration\":2,\"waterAmount\":300}},\"timestamp\":\"2025-03-17T21:04:35.734071500\"}', NULL, '2025-03-17 21:04:35.734072', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (7, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":300,\"irrigationType\":\"drip\"},\"timestamp\":\"2025-03-17T21:33:33.678627300\"}', NULL, '2025-03-17 21:33:33.681627', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (8, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":300,\"irrigationMethod\":\"drip\",\"priorityCrop\":\"wheat\"},\"timestamp\":\"2025-03-17T21:34:07.952447600\"}', NULL, '2025-03-17 21:34:07.953587', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (9, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":700,\"irrigationMethod\":\"drip\"},\"timestamp\":\"2025-03-17T21:34:11.298116300\"}', NULL, '2025-03-17 21:34:11.299116', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (10, 'irrigate', '{\"action\":\"irrigate\",\"target\":\"field-2\",\"parameters\":{\"duration\":4,\"waterAmount\":700},\"timestamp\":\"2025-03-19T15:29:54.873500500\"}', NULL, '2025-03-19 15:29:54.877499', 'SIM-1742216014669');
+INSERT INTO `agent_command` VALUES (11, 'plant', '{\"action\":\"plant\",\"target\":\"field-2\",\"parameters\":{\"cropType\":\"wheat\",\"variety\":\"drought-resistant\",\"plantingDate\":\"2023-04-15\"},\"timestamp\":\"2025-03-19T15:29:58.785647600\"}', NULL, '2025-03-19 15:29:58.785648', 'SIM-1742216014669');
 
 -- ----------------------------
 -- Table structure for agent_dialogue
@@ -81,7 +118,7 @@ CREATE TABLE `agent_dialogue`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FKqbd99dwt1ve2qp0ywp39iy777`(`simulation_id` ASC) USING BTREE,
   CONSTRAINT `FKqbd99dwt1ve2qp0ywp39iy777` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 250 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 265 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of agent_dialogue
@@ -335,6 +372,21 @@ INSERT INTO `agent_dialogue` VALUES (246, 'AGENT-1742129348317', '', 'FARMER', '
 INSERT INTO `agent_dialogue` VALUES (247, 'AGENT-1742129348317', '', 'FARMER', '2025-03-17 17:41:32.515852', 'SIM-1742129341880');
 INSERT INTO `agent_dialogue` VALUES (248, 'AGENT-1742129348317', '面对寒潮，我们需要采取一系列措施来保护作物，尤其是小麦，因为它对低温非常敏感。以下是一些建议：\n\n1. **提前预警**：密切关注天气预报，以便在寒潮到来之前做好准备。\n\n2. **覆盖保护**：使用草垫、秸秆或者专门的农业覆盖材料覆盖作物，以提供额外的保暖。\n\n3. **灌溉**：在寒潮来临前进行灌溉，因为水分可以释放热量，帮助提高土壤和作物的温度。\n\n4. **施肥**：增施磷钾肥，这些肥料能增强作物的抗寒能力。\n\n5. **推迟种植**：如果尚未种植，考虑推迟种植时间，直到寒潮过去。\n\n6. **选择更抗寒的作物**：考虑到当前的环境和技术条件，如果小麦生长率较低，可以考虑种植更抗寒的作物。比如：\n\n||JSON_START||{\"action\":\"plant\",\"crop\":\"corn\",\"quantity\":5}||JSON_END||\n_玉米通常比小麦更能抵御低温，因此可以考虑在寒潮过后种植5亩玉米。_\n\n7. **加强作物管理**：寒潮过后，检查作物受损情况，及时清理冻死的植物残体，减少病虫害的发生。\n\n8. **使用抗寒剂**：市面上有一些抗寒剂可以在寒潮来临前喷洒在作物上，帮助作物抵御低温。\n\n请注意，以上建议需要根据实际情况进行调整，确保最适合你的农场条件。', 'FARMER', '2025-03-17 17:52:46.949127', 'SIM-1742129341880');
 INSERT INTO `agent_dialogue` VALUES (249, 'AGENT-1742129348317', '面对寒潮，我们需要采取一系列措施来保护作物，尤其是对于小麦等不耐寒的作物。以下是一些建议：\n\n1. **及时收获**：如果小麦已经接近成熟期，应尽快收获以避免寒潮造成的损失。\n\n2. **覆盖保护**：使用塑料薄膜、稻草或者其它覆盖物为作物提供额外的保暖。\n\n3. **灌溉**：在寒潮来临前进行灌溉，因为水分可以释放热量，为作物提供一定的保护。\n\n4. **防风措施**：在田地周围设置防风障，减少寒风对作物的直接影响。\n\n5. **化学防护**：使用抗冻剂或者植物生长调节剂来提高作物的抗寒能力。\n\n6. **选择更耐寒的作物**：鉴于当前的环境和技术条件，可以考虑在寒潮后种植更耐寒的作物。\n\n根据你的JSON指令，这里提供种植建议：\n\n||JSON_START||{\"action\":\"plant\",\"crop\":\"corn\",\"quantity\":5}||JSON_END||\n**种植建议**：考虑到寒潮的影响，建议在寒潮过后，土壤温度适宜时，种植5亩抗寒性较强的玉米。玉米相比小麦更耐寒，且生长周期较短，可以在较短的时间内收获，减少因气候变化带来的风险。\n\n请注意，种植任何作物之前，应先评估土壤条件、修复可能由寒潮造成的损害，并考虑当地的气候预报。', 'FARMER', '2025-03-17 17:52:49.633848', 'SIM-1742129341880');
+INSERT INTO `agent_dialogue` VALUES (250, 'AGENT-1742212594705', '面对干旱情况，以下是一些应对措施：\n\n1. **灌溉管理**：\n   - 如果可能，立即启动灌溉系统，保证作物获得必要的水分。\n   - 优化灌溉策略，比如采用滴灌或喷灌等节水灌溉技术，减少水的浪费。\n\n2. **土壤管理**：\n   - 采用覆盖作物残体或有机物料的方法，如秸秆还田，可以提高土壤的保水能力。\n   - 进行深松土，增加土壤的渗透性和保水能力。\n\n3. **作物管理**：\n   - 选择耐旱性更强的小麦品种进行种植。\n   - 适当调整种植密度，减少作物之间的水分竞争。\n\n4. **水分保持**：\n   - 在干旱季节前，提前储备水源，如建立小型的蓄水池或水窖。\n   - 采用水分保持剂或土壤湿润剂，帮助土壤保持水分。\n\n5. **农业技术**：\n   - 考虑采用先进的农业技术，如精准农业，通过土壤水分传感器和天气预报来精确控制灌溉。\n   - 推广旱作农业技术，如旱直播、抗旱保水剂的使用等。\n\n6. **种植多样化**：\n   - 种植一些耐旱性更好的作物，减少对小麦的依赖。\n   - 实施轮作制度，提高土壤肥力和水分利用效率。\n\n7. **政策支持**：\n   - 寻求政府或相关部门的援助，如干旱补贴、紧急灌溉设施建设等。\n   - 参与农业保险，减轻干旱造成的经济损失。\n\n8. **监测和评估**：\n   - 定期监测土壤水分和作物生长情况，及时调整管理策略。\n   - 评估干旱对作物产量的影响，为未来的种植计划提供数据支持。\n\n采取这些措施可以帮助缓解干旱对作物生长的影响，并尽可能减少产量损失。', 'FARMER', '2025-03-17 19:58:16.998464', 'SIM-1742212589133');
+INSERT INTO `agent_dialogue` VALUES (251, 'AGENT-1742214770582', '要提高农作物产量，尤其是小麦，在当前给定的环境条件下，可以采取以下措施：\n\n1. **土壤改良**：\n   - 由于土壤肥力只有10%，首先应改善土壤质量。可以通过增加有机肥料（如农家肥、绿肥、堆肥等）来提高土壤肥力。\n   - 使用石灰或石膏等土壤调节剂调整土壤pH值到适宜范围（对于小麦来说，pH 6.0-7.5较为理想）。\n\n2. **灌溉管理**：\n   - 给定降水量为200.0mm，可能不足以支持小麦生长。应考虑建立灌溉系统，保证作物生长关键期（如抽穗期和灌浆期）的水分供应。\n\n3. **作物轮作**：\n   - 实施作物轮作可以减少土传病害，提高土壤肥力，避免连作障碍。\n\n4. **种植密度和时机**：\n   - 根据当地气候条件选择适宜的播种时间，一般是在秋季。\n   - 调整播种密度，确保每株植物有足够的空间进行光合作用和根系发展。\n\n5. **病虫害管理**：\n   - 定期监测作物病虫害，及时采取防治措施，减少产量损失。\n\n6. **施肥管理**：\n   - 根据土壤测试结果，合理施用氮、磷、钾等化肥，确保作物营养均衡。\n\n7. **农业技术改进**：\n   - 如果目前使用的是传统农业技术，可以考虑采用一些现代农业技术，如精准农业、滴灌、地膜覆盖等，以提高水肥利用效率和产量。\n\n8. **品种选择**：\n   - 选择适应本地气候和土壤条件，且生长率高的品种。如果当前小麦生长率为1.00，可能需要尝试其他品种。\n\n9. **收获时间**：\n   - 确定合适的收获时间，以最大限度地提高产量和品质。\n\n通过综合运用上述措施，可以在现有的环境条件下显著提高农作物产量。', 'FARMER', '2025-03-17 20:33:34.563296', 'SIM-1742214765033');
+INSERT INTO `agent_dialogue` VALUES (252, 'AGENT-1742212594705', '面对干旱情况，以下是一些应对措施：\n\n1. **灌溉管理**：\n   - 如果可能的话，建立灌溉系统，确保作物在干旱期间能够获得足够的水分。\n   - 采用滴灌或微灌等节水灌溉技术，减少水的浪费，提高灌溉效率。\n\n2. **土壤管理**：\n   - 增加有机物的施用，如堆肥或绿肥，以提高土壤的保水能力。\n   - 进行深翻和松土，以增加土壤的渗透性和保水性。\n\n3. **作物选择**：\n   - 选择耐旱性强的作物品种，如小麦中耐旱的品种。\n   - 考虑轮作，种植一些根系深、能更好地利用地下水的作物。\n\n4. **种植技术**：\n   - 适当调整播种时间，以避免作物生长的关键阶段与干旱期重合。\n   - 采取覆膜栽培技术，减少土壤水分蒸发。\n\n5. **作物保护**：\n   - 使用抗蒸腾剂或其他保护剂，减少水分通过叶面蒸腾。\n   - 及时除草，减少水分和养分的竞争。\n\n6. **水资源管理**：\n   - 收集雨水，用于灌溉。\n   - 减少非生产性用水，如庭院绿化等，优先保证农业生产用水。\n\n7. **预警和监测**：\n   - 关注气象预报和干旱预警信息，及时采取应对措施。\n   - 定期监测土壤水分，合理安排灌溉。\n\n8. **保险和政策支持**：\n   - 考虑购买农业保险，以减轻干旱带来的经济损失。\n   - 了解和利用政府提供的干旱救济或补贴政策。\n\n通过上述措施，可以有效地减轻干旱对农业生产的影响，保护作物生长，减少经济损失。', 'FARMER', '2025-03-17 20:55:25.823060', 'SIM-1742212589133');
+INSERT INTO `agent_dialogue` VALUES (253, 'AGENT-1742216028424', '面对干旱情况，以下是一些应对策略和建议：\n\n1. **水分管理**：\n   - **灌溉**：如果条件允许，建立灌溉系统或者采用滴灌、喷灌等节水灌溉方式，以确保作物获得必要的水分。\n   - **集水**：利用雨水收集系统，收集并储存雨水用于干旱时期的灌溉。\n\n2. **土壤改良**：\n   - **增加有机物**：通过施用有机肥料（如堆肥）来提高土壤的保水能力。\n   - **土壤覆盖**：使用作物残体或者草垫覆盖土壤表面，减少水分蒸发。\n\n3. **种植适应干旱的作物**：\n   - 如果可能，考虑改种一些耐旱性更强的作物，比如某些小麦品种、高粱或者豆类。\n\n4. **耕作技术**：\n   - **深翻**：深翻土壤可以增加土壤的蓄水能力。\n   - **免耕或减耕**：减少对土壤的扰动可以保护土壤结构，减少水分蒸发。\n\n5. **作物管理**：\n   - **调整播种时间**：如果可能，选择在降雨较多的季节播种。\n   - **合理密植**：通过合理密植可以减少水分蒸发，提高水分利用效率。\n\n6. **病虫害防治**：\n   - 干旱条件下，作物更容易受到病虫害的侵害，因此要加强监测，及时防治。\n\n7. **政府支持和保险**：\n   - 寻求政府的支持和援助，如干旱灾害补贴、灌溉设施建设支持等。\n   - 考虑购买农业保险，以减轻干旱带来的经济损失。\n\n8. **持续监测**：\n   - 定期监测土壤湿度、天气预报和作物生长状况，以便及时调整管理策略。\n\n请根据实际情况和可用资源，选择最合适的策略来应对干旱。', 'FARMER', '2025-03-17 20:56:19.596071', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (254, 'AGENT-1742216030340', '作为一个负责作物种植和管理的农民，面对当前的环境和干旱情况，我会采取以下具体措施：\n\n1. **水分管理**：\n   - 我会考虑投资滴灌系统，因为它可以节水并直接向作物根部供水，减少水分蒸发。\n   - 我会安装雨水收集系统，特别是在雨季，以便在干旱期间使用储存的水源。\n\n2. **土壤改良**：\n   - 我会在秋季进行土壤深翻，以便冬季土壤有足够时间恢复结构，增强保水能力。\n   - 我会定期施用有机肥料，比如堆肥或绿肥，以提高土壤有机质含量和保水能力。\n\n3. **作物选择**：\n   - 我会研究并选择耐旱性强的小麦品种，或者考虑种植其他耐旱作物，如高粱或豆类。\n\n4. **耕作技术**：\n   - 我可能会采用免耕或减耕技术，减少对土壤的扰动，保持土壤结构。\n\n5. **作物管理**：\n   - 我会根据天气预报和土壤湿度，选择最佳播种时间，尽可能利用自然降水。\n   - 我会通过合理密植来减少水分蒸发，同时确保作物之间的通风和光照。\n\n6. **病虫害防治**：\n   - 我会定期检查作物，一旦发现病虫害的迹象，就会及时采取措施进行防治。\n\n7. **政府支持和保险**：\n   - 我会积极了解政府的干旱援助政策和农业保险计划，以便在需要时申请援助或购买保险。\n\n8. **持续监测**：\n   - 我会使用土壤湿度计和气象服务来监测土壤湿度和天气预报，以便及时调整种植和灌溉计划。\n\n通过这些措施，我希望能最大限度地减少干旱对作物种植的影响，并确保作物能够在这种恶劣环境下尽可能地生长。同时，我也会保持对新技术和方法的关注，以便不断改进种植管理策略。', 'FARMER', '2025-03-17 20:56:32.374138', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (255, 'AGENT-1742214770582', '根据提供的环境和作物数据，以下是我作为农业专家的一些建议：\n\n1. **土壤肥力改善**：\n   - 由于土壤肥力只有10%，这可能对作物生长产生不利影响。建议增加有机肥料的使用，如堆肥、绿肥或者动物粪便，以提高土壤有机质含量和肥力。\n   - 可以考虑进行土壤测试，以确定具体的营养缺乏，并据此施用特定的化肥。\n\n2. **降水量管理**：\n   - 降水量为200.0mm，对于温带季风气候来说可能偏少。建议考虑灌溉系统，以确保作物在干旱时期也能获得足够的水分。\n   - 可以采用节水灌溉技术，如滴灌或喷灌，以提高水资源利用效率。\n\n3. **作物种植计划**：\n   - 由于列出的是多种小麦，且生长率相同，可能表明该地区适合种植小麦。但是，建议进行作物轮作，以减少土壤病虫害的发生和维持土壤肥力。\n\n4. **种植时间**：\n   - 根据温带季风气候的特点，选择合适的播种时间至关重要。通常，秋季是种植小麦的好时机，因为冬季的低温有助于小麦的分蘖和春季的生长。\n\n5. **病虫害防治**：\n   - 定期监测作物，一旦发现病虫害，及时采取措施。使用生物农药或者低毒农药，减少对环境的影响。\n\n6. **技术提升**：\n   - 考虑到农业技术是传统的，建议学习新的农业技术和管理方法，如精准农业、GIS土壤管理、作物生长监测等，以提高作物产量和降低生产成本。\n\n7. **作物多样化**：\n   - 尝试种植其他适合该地区的作物，以分散风险和增加收入来源。\n\n8. **气候变化适应性**：\n   - 由于气候变化可能影响降水量和温度，建议关注当地气候预报，并采取适应性措施，如选择适应性强的作物品种，或者调整种植时间。\n\n综上所述，建议在改善土壤肥力、管理水资源、采用新技术、合理规划种植时间等方面进行综合考虑，以优化作物生产。', 'FARMER', '2025-03-17 20:58:54.297870', 'SIM-1742214765033');
+INSERT INTO `agent_dialogue` VALUES (256, 'AGENT-1742216020483', '作为一个农民，我会根据这些建议来具体规划我的作物种植和管理策略：\n\n1. **土壤肥力改善**：\n   - 我会开始收集和堆肥，利用农场的有机废物，比如作物残体和动物粪便，来提高土壤肥力。\n   - 我也会联系当地的农业服务机构，进行土壤测试，以便更准确地了解土壤中缺乏哪些养分，并购买相应的肥料进行补充。\n\n2. **降水量管理**：\n   - 我会考虑安装灌溉系统，特别是滴灌或喷灌系统，这样可以在干旱时为作物提供必要的水分，同时节约用水。\n   - 我还会关注天气预报，合理安排灌溉时间，避免水分浪费。\n\n3. **作物种植计划**：\n   - 我会实行作物轮作制度，比如在种植小麦之后，下一季可能会种植豆类或者蔬菜，以改善土壤结构和减少病虫害。\n   - 我也会研究其他适合我所在地区的作物，以增加作物的多样性。\n\n4. **种植时间**：\n   - 我会根据当地的气候条件，选择最佳的播种时间，确保小麦能够在冬季分蘖，春季生长。\n\n5. **病虫害防治**：\n   - 我会定期检查作物，一旦发现病虫害的迹象，就会采取措施，比如使用天然的病虫害防治方法，或者选择低毒的农药。\n\n6. **技术提升**：\n   - 我会参加农业培训课程，学习新的农业技术和管理方法，比如精准农业技术，以提高作物产量和降低成本。\n\n7. **作物多样化**：\n   - 我会尝试种植一些新的作物，比如蔬菜或者油料作物，以增加农场的收入来源。\n\n8. **气候变化适应性**：\n   - 我会关注气候变化对我所在地区的影响，选择适应性强的作物品种，并准备在必要时调整种植计划。\n\n通过这些措施，我可以更好地适应环境条件，提高作物产量和农场经营的可持续性。', 'FARMER', '2025-03-17 20:59:06.924147', 'SIM-1742214765033');
+INSERT INTO `agent_dialogue` VALUES (257, 'AGENT-1742216028424', '面对干旱情况，以下是一些建议来帮助减轻干旱对作物的影响：\n\n1. **水资源管理**：\n   - **灌溉**：如果可能的话，考虑实施灌溉系统，即使是简易的滴灌或喷灌也可以有效节约用水。\n   - **水井**：如果地下水资源充足，可以挖掘水井来保证灌溉水源。\n   - **集水**：在农田中建设集水池或水窖，收集雨水用于干旱期间灌溉。\n\n2. **作物选择**：\n   - 选择耐旱性强的作物品种，如小麦中的一些耐旱品种。\n   - 重新评估种植计划，考虑改种其他耐旱作物。\n\n3. **土壤管理**：\n   - **覆盖作物**：种植覆盖作物，如草或豆科植物，以减少土壤水分蒸发。\n   - **土壤改良**：增加有机物如堆肥或绿肥，提高土壤保水能力。\n   - **深松**：通过深松土壤，可以增加土壤的渗透性和保水能力。\n\n4. **种植技术**：\n   - **调整种植时间**：选择在降水较多的季节播种，利用自然降水。\n   - **旱作农业技术**：采用旱作农业技术，如条播、点播，减少用水量。\n\n5. **病虫害管理**：\n   - 干旱条件下，病虫害可能更加严重，合理使用农药和生物防治方法来保护作物。\n\n6. **农业保险**：\n   - 考虑购买农业保险，以减轻因干旱造成的经济损失。\n\n7. **政府和社区支持**：\n   - 寻求政府或社区的援助，如干旱灾害救助、技术支持等。\n\n8. **监测和评估**：\n   - 定期监测土壤湿度和天气预报，合理调整农业生产计划。\n\n请根据你的实际情况，选择合适的策略来应对干旱。记住，预防措施和及时的应对策略是减轻干旱影响的关键。', 'FARMER', '2025-03-17 21:04:35.229594', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (258, 'AGENT-1742216030340', '作为一个负责作物种植和管理的农民，面对干旱情况，我会采取以下具体措施：\n\n1. **水资源管理**：\n   - 我会考虑安装简易的滴灌系统，因为它可以精确地给作物供水，减少水的浪费。\n   - 我会调查地下水资源的情况，如果条件允许，我会挖掘水井来保证灌溉水源。\n   - 我会在农田中建设集水池或水窖，尤其是在雨季期间收集雨水，以便在干旱期间使用。\n\n2. **作物选择**：\n   - 我会选择耐旱性更强的小麦品种进行种植，以提高作物在干旱条件下的生存率。\n   - 我也会考虑种植其他耐旱作物，如高粱或燕麦，以分散风险。\n\n3. **土壤管理**：\n   - 我会在休耕期种植覆盖作物，如豆科植物，以保护土壤免受阳光直射，减少水分蒸发。\n   - 我会增加有机物的使用，如施用堆肥，以提高土壤的保水能力。\n   - 我会定期进行深松土壤，以改善土壤结构，使其更能保持水分。\n\n4. **种植技术**：\n   - 我会根据天气预报和降水情况来调整种植时间，尽量在雨季初期播种。\n   - 我会采用旱作农业技术，比如条播，这样可以减少用水量，同时保持土壤覆盖。\n\n5. **病虫害管理**：\n   - 我会密切关注作物状况，及时使用生物农药或其他环保型防治方法来应对可能增加的病虫害问题。\n\n6. **农业保险**：\n   - 我会考虑购买农业保险，以防干旱造成的损失。\n\n7. **政府和社区支持**：\n   - 我会积极寻求政府的干旱灾害救助计划，同时与社区合作，分享资源和技术。\n\n8. **监测和评估**：\n   - 我会定期监测土壤湿度，并根据天气变化和作物生长情况调整灌溉和种植策略。\n\n通过这些措施，我希望能够在干旱条件下尽可能地保证作物产量，同时减少对水资源的依赖。', 'FARMER', '2025-03-17 21:04:52.582371', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (259, 'AGENT-1742216028424', '面对干旱情况，以下是一些建议来帮助减轻干旱对作物的影响：\n\n1. **灌溉管理**：\n   - 如果可能，实施灌溉来补充土壤水分。在水源有限的情况下，选择高效的灌溉方法，如滴灌或喷灌，以减少水的浪费。\n   - 确定作物的关键生长期，并在这些时期优先保证水分供应。\n\n2. **土壤改良**：\n   - 增加有机物的施用，如堆肥或绿肥，以提高土壤的保水能力。\n   - 使用土壤湿润剂或保水剂来减少土壤水分蒸发。\n\n3. **作物选择**：\n   - 选择耐旱性强的作物品种，如果可能，考虑改种那些对水分要求较低的作物。\n   - 对于小麦，可以选择一些早熟或耐旱的品种，这些品种能在较短的生长周期内完成生长。\n\n4. **耕作技术**：\n   - 采用覆盖作物或地膜覆盖技术，减少土壤水分蒸发。\n   - 实施深松耕作，以增加土壤的渗透性和保水能力。\n\n5. **施肥管理**：\n   - 适当施用氮肥和磷肥，以提高作物的抗旱能力。\n   - 避免过量施肥，因为这可能导致土壤盐分积累，进一步恶化干旱状况。\n\n6. **作物轮作**：\n   - 实施作物轮作，以减少土壤中特定病原体和害虫的积累，并改善土壤结构。\n\n7. **病虫害管理**：\n   - 干旱条件下，病虫害的发生可能会增加，因此需要定期监测并采取适当的防治措施。\n\n8. **水资源管理**：\n   - 开发和利用地下水、集雨系统和再生水等非传统水资源。\n   - 优化水资源的分配，确保在干旱期间优先满足最关键的作物和生长期的需求。\n\n9. **监测和评估**：\n   - 定期监测土壤湿度和作物生长状况，以便及时调整管理策略。\n\n通过这些措施，可以最大限度地减少干旱对作物产量的影响，并提高农业生产的可持续性。', 'FARMER', '2025-03-17 21:33:41.755524', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (260, 'AGENT-1742216030340', '作为一个负责作物种植和管理的农民，我会根据当前的环境和作物情况，具体实施以下建议：\n\n1. **灌溉管理**：\n   - 由于我们面临干旱，我会优先考虑安装滴灌系统，这样可以精确地给作物供水，减少水的浪费。\n   - 我会密切关注天气预报和土壤湿度，以确保在关键生长阶段，如小麦的拔节期和抽穗期，有足够的水分供应。\n\n2. **土壤改良**：\n   - 我计划在秋季收获后增加有机物的施用，如施入农家肥或绿肥，以提高土壤的有机质含量和保水能力。\n   - 我还会考虑使用保水剂，尤其是在播种前，以帮助土壤保持水分。\n\n3. **作物选择**：\n   - 我会选择耐旱性强的小麦品种进行种植，这些品种能够在水分有限的条件下生长。\n   - 如果可能，我还想尝试一些适应性强的其他作物，如燕麦或高粱，以增加作物多样性。\n\n4. **耕作技术**：\n   - 我将采用地膜覆盖技术，特别是在春季干旱时，以减少水分蒸发并保持土壤温度。\n   - 我还会定期进行深松耕作，以打破犁底层，提高土壤的透水性和透气性。\n\n5. **施肥管理**：\n   - 我会在播种前施入适量的氮肥和磷肥，以增强作物的抗旱能力。\n   - 我会避免过量施肥，并定期进行土壤测试，以监测土壤肥力和盐分水平。\n\n6. **作物轮作**：\n   - 我会实施作物轮作计划，比如在小麦之后种植豆科作物，以改善土壤结构和减少病虫害。\n\n7. **病虫害管理**：\n   - 我会定期检查作物，以监测病虫害的发生，并及时采取防治措施，如使用生物农药或物理方法。\n\n8. **水资源管理**：\n   - 我会考虑挖掘水井或建设集雨设施，以利用地下水或雨水资源。\n   - 我还会制定一个水资源分配计划，确保在干旱期间有限的水资源能够高效利用。\n\n9. **监测和评估**：\n   - 我会记录土壤湿度、降雨量、作物生长状况等数据，以便分析并调整种植策略。\n\n通过这些综合措施，我希望能有效地应对干旱挑战，确保作物生长的最佳条件，并尽可能地提高产量和农业生产的可持续性。', 'FARMER', '2025-03-17 21:33:57.688983', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (261, 'AGENT-1742216028424', '面对干旱的情况，以下是一些应对措施：\n\n1. **水管理**：\n   - **灌溉**：如果可能的话，建立灌溉系统或者使用移动灌溉设备给作物供水。\n   - **水资源节约**：采用滴灌、喷灌等节水灌溉技术，减少水的浪费。\n   - **集水**：利用集雨设施收集雨水，用于干旱时期的灌溉。\n\n2. **土壤管理**：\n   - **覆盖作物**：使用作物残体或者塑料薄膜等材料覆盖土壤，减少水分蒸发。\n   - **改善土壤结构**：增加有机质的投入，提高土壤的保水能力。\n\n3. **作物管理**：\n   - **选择耐旱品种**：种植耐旱性更强的小麦品种，这些品种能够在水分较少的情况下仍保持一定的生长率。\n   - **调整种植时间**：尽量选择在雨季或者预计降水较多的时期播种。\n\n4. **农艺措施**：\n   - **深松土**：深松土可以增加土壤的渗透性，帮助水分深入土壤，减少表面蒸发。\n   - **合理施肥**：适量施用磷肥和钾肥，这两种肥料能提高作物的抗旱能力。\n\n5. **技术支持**：\n   - **使用保水剂**：这些物质能吸收并保持大量的水分，缓慢释放给作物。\n   - **采用抗旱栽培技术**：比如抗旱播种技术，减少播种深度，使种子更容易接触到土壤中的水分。\n\n6. **应急措施**：\n   - **及时收获**：对于已经受到干旱影响的作物，及时收获可以减少损失。\n   - **保险**：购买农业保险可以在一定程度上减轻干旱造成的经济损失。\n\n综合以上措施，你需要根据实际情况和可用资源，选择最合适的应对策略。在干旱期间，密切关注天气预报和土壤水分状况，灵活调整管理措施。', 'FARMER', '2025-03-17 21:57:39.358857', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (262, 'AGENT-1742216030340', '作为一个负责作物种植和管理的农民，面对干旱的情况，我会采取以下具体建议：\n\n1. **水管理**：\n   - 我会考虑安装滴灌或喷灌系统，以提高灌溉效率，减少水的浪费。\n   - 我会修建集雨设施，如水窖或简易的水坝，来收集雨水，以便在干旱期间使用。\n\n2. **土壤管理**：\n   - 我会在土壤表面覆盖作物残体或使用塑料薄膜，以降低水分蒸发。\n   - 我会增加有机物的投入，如施用有机肥料，以提高土壤的保水能力。\n\n3. **作物管理**：\n   - 我会选择耐旱性较强的小麦品种进行种植，这些品种适合在低水分条件下生长。\n   - 我会根据天气预报和降水模式调整种植时间，尽量在降水较多的季节播种。\n\n4. **农艺措施**：\n   - 我会定期深松土，以增加土壤的透水性，帮助水分更好地渗透到土壤深层。\n   - 我会合理施肥，特别注重磷肥和钾肥的施用，以提高作物的抗旱性。\n\n5. **技术支持**：\n   - 我会使用保水剂，以帮助土壤保持更多的水分，供作物在干旱期间使用。\n   - 我会采用抗旱播种技术，如浅播，以确保种子能快速接触到水分。\n\n6. **应急措施**：\n   - 一旦干旱情况恶化，我会及时收获部分作物，以减少损失。\n   - 我会考虑购买农业保险，以防干旱导致的经济损失。\n\n总的来说，我会密切关注天气变化和土壤水分状况，及时调整种植和灌溉策略。同时，我会寻求政府的支持和指导，利用现代农业技术和方法来应对干旱挑战。此外，我也会积极参与社区活动，与当地农民交流经验，共同提高抗旱能力。', 'FARMER', '2025-03-17 21:57:51.983896', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (263, 'AGENT-1742216028424', '面对干旱的情况，以下是一些建议来帮助缓解干旱对作物的影响：\n\n1. **水资源管理**：\n   - **灌溉**：如果可能的话，考虑实施灌溉系统，即使是简易的滴灌或喷灌也可以有效节约水资源。\n   - **集水**：建立集水设施，如水塘或雨水收集系统，以储存雨水用于干旱期间。\n\n2. **土壤管理**：\n   - **覆盖作物**：使用覆盖作物或覆盖材料（如稻草）来减少土壤水分蒸发。\n   - **改善土壤结构**：通过添加有机物（如堆肥）来提高土壤的保水能力。\n\n3. **作物管理**：\n   - **选择耐旱作物**：如果可能，考虑种植耐旱性更强的作物品种，如小麦的某些耐旱品种。\n   - **调整种植时间**：根据当地的气候周期，调整种植时间，尽量避开干旱季节。\n\n4. **技术措施**：\n   - **使用保水剂**：在播种时使用吸水性强的聚合物材料，帮助土壤保持水分。\n   - **实施抗蒸腾剂**：使用抗蒸腾剂减少植物水分蒸发。\n\n5. **病虫害控制**：\n   - 干旱条件下，植物更容易受到病虫害的侵害，因此需要加强监测并采取及时的控制措施。\n\n6. **农业保险**：\n   - 考虑购买农业保险，以减轻因干旱造成的经济损失。\n\n7. **政府援助**：\n   - 寻求政府或当地农业部门的援助，了解是否有干旱救济项目或补贴。\n\n8. **长期规划**：\n   - 考虑长期气候变化趋势，制定适应干旱的农业生产策略。\n   - 进行土壤和水资源可持续管理的研究，以减少未来干旱的风险。\n\n这些措施需要根据你所在地区的具体情况和可用资源进行调整。在干旱情况下，及时采取行动至关重要，以保护作物和减少损失。', 'FARMER', '2025-03-19 15:29:36.708781', 'SIM-1742216014669');
+INSERT INTO `agent_dialogue` VALUES (264, 'AGENT-1742216030340', '作为一个负责作物种植和管理的农民，面对干旱的情况，我会根据当前的环境和作物情况，具体采取以下措施：\n\n1. **水资源管理**：\n   - 我会评估现有的水源，并尽可能地实施灌溉系统。如果条件允许，我会选择滴灌或喷灌，因为这些方法可以减少水的浪费。\n   - 我会考虑建立水塘或雨水收集系统来储备水资源，特别是在雨季期间。\n\n2. **土壤管理**：\n   - 我会在土壤表面覆盖稻草或其他有机材料，以减少水分蒸发。\n   - 我会增加有机物的施用量，如堆肥或绿肥，以提高土壤的保水能力。\n\n3. **作物管理**：\n   - 我会选择种植耐旱性更强的小麦品种，并了解这些品种的生长习性和需求。\n   - 我会根据气候条件调整种植时间，尽量在干旱季节之前或之后种植。\n\n4. **技术措施**：\n   - 我会使用保水剂来提高土壤的水分保持能力。\n   - 如果必要，我会考虑使用抗蒸腾剂来减少作物的水分流失。\n\n5. **病虫害控制**：\n   - 我会定期检查作物，及时发现并处理病虫害问题，以减少干旱带来的额外压力。\n\n6. **农业保险**：\n   - 我会考虑购买农业保险，以防干旱导致的严重经济损失。\n\n7. **政府援助**：\n   - 我会积极寻求政府援助，了解是否有干旱救济措施或补贴，以减轻经济负担。\n\n8. **长期规划**：\n   - 我会关注气候变化趋势，并制定长期适应干旱的策略，包括选择更适合的作物种类和改进农业实践。\n   - 我会投资于土壤和水的可持续管理，以增强农场对未来干旱的抵御能力。\n\n综上所述，我会采取一系列综合措施来应对干旱，确保作物种植的可持续性和减少对环境的影响。同时，我也会保持对当地气候和农业市场的关注，以便及时调整种植计划。', 'FARMER', '2025-03-19 15:29:50.278776', 'SIM-1742216014669');
 
 -- ----------------------------
 -- Table structure for agent_properties
@@ -374,21 +426,51 @@ CREATE TABLE `crop`  (
 -- ----------------------------
 INSERT INTO `crop` VALUES ('004f1c9e-3384-4e20-80ed-cc24daba2578', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
 INSERT INTO `crop` VALUES ('048292de-a58c-4289-b0c4-b3eeed06a261', '苹果', 0, 0, 0, 0, 'SIM-1742042110582');
+INSERT INTO `crop` VALUES ('0a8c2fd2-8eeb-4cb8-b756-c2b115c4ab3c', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742212589133');
 INSERT INTO `crop` VALUES ('10b5ccff-01fb-4711-89bb-53956239ab0b', '水稻', 0, 0, 0, 0, 'SIM-1742039118193');
 INSERT INTO `crop` VALUES ('3858e748-ca41-49c0-a7e5-7ca8ef3cc84d', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742129571107');
 INSERT INTO `crop` VALUES ('47501007-4cb4-4964-ab0c-2c9fdf8a7cc7', '苹果', 0, 0, 0, 0, 'SIM-1742040857118');
 INSERT INTO `crop` VALUES ('54c5047a-f644-4c2c-b055-360860bf9d32', '小麦', 0, 0, 0, 0, 'SIM-1742129341880');
+INSERT INTO `crop` VALUES ('6b4cce1e-2459-46d9-8d89-a1afef7f376a', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742214765033');
+INSERT INTO `crop` VALUES ('7bf0cc80-72b3-4672-97a6-41d9618098a9', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742216014669');
 INSERT INTO `crop` VALUES ('a8085e2f-4db2-4425-aa9b-3ac2ed5af725', '小麦', 0, 0, 0, 0, 'SIM-1742040857118');
+INSERT INTO `crop` VALUES ('a881f2a3-7ca1-4501-b272-6c62ef9cd15b', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742214765033');
 INSERT INTO `crop` VALUES ('ac78644b-7c8c-4012-ac02-37835d67ec86', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
 INSERT INTO `crop` VALUES ('bde9334e-518f-440e-aced-b9c19c2631d8', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
+INSERT INTO `crop` VALUES ('c207d712-3349-4d12-bdee-e835610c6066', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742214765033');
 INSERT INTO `crop` VALUES ('c211c4c0-0d93-4ab6-b1c5-b0f7a11dcc9e', '小麦', 0.8, 0.6, 0.5, 0.7, 'SIM-1742036785372');
 INSERT INTO `crop` VALUES ('c3a02ab3-3cba-4182-806a-13018883fa24', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
 INSERT INTO `crop` VALUES ('e2ad2c00-9ff3-4e43-b2fe-155e7b8f1ff1', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
+INSERT INTO `crop` VALUES ('e966b720-c166-4ae1-b3de-2a4b00a78b09', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742214765033');
 INSERT INTO `crop` VALUES ('e9b15b76-e9de-4167-9ea5-9cf07f2f0667', '苹果', 0, 0, 0, 0, 'SIM-1742042280240');
 INSERT INTO `crop` VALUES ('eb52550b-d4d0-4806-b20b-5a0b9725b9d5', '水稻', 0, 0, 0, 0, 'SIM-1742040857118');
 INSERT INTO `crop` VALUES ('ed02f416-45bb-4674-ac66-bce161448f0c', '小麦', 0, 0, 0, 0, 'SIM-1742038113060');
+INSERT INTO `crop` VALUES ('f4efcf75-818f-413f-8d01-38d199c876f9', '小麦', 1, 0.5, 0.5, 0.5, 'SIM-1742214765033');
 INSERT INTO `crop` VALUES ('f66e1272-1ab8-44e6-a0de-2d1f16224d50', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
 INSERT INTO `crop` VALUES ('fbb5aa24-651a-4708-9f6e-266a04194928', '小麦', 0, 0, 0, 0, 'SIM-1741937262514');
+
+-- ----------------------------
+-- Table structure for crop_yield_history
+-- ----------------------------
+DROP TABLE IF EXISTS `crop_yield_history`;
+CREATE TABLE `crop_yield_history`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `crop_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `timestamp` datetime(6) NULL DEFAULT NULL,
+  `yield` double NOT NULL,
+  `simulation_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK67i2ibhs4ib8q32mf7eujf1rj`(`simulation_id` ASC) USING BTREE,
+  CONSTRAINT `FK67i2ibhs4ib8q32mf7eujf1rj` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of crop_yield_history
+-- ----------------------------
+INSERT INTO `crop_yield_history` VALUES (1, '7bf0cc80-72b3-4672-97a6-41d9618098a9', '2025-03-17 20:57:25.655112', 901.4250000000001, 'SIM-1742216014669');
+INSERT INTO `crop_yield_history` VALUES (2, '7bf0cc80-72b3-4672-97a6-41d9618098a9', '2025-03-17 20:57:25.671625', 901.4250000000001, 'SIM-1742216014669');
+INSERT INTO `crop_yield_history` VALUES (3, '7bf0cc80-72b3-4672-97a6-41d9618098a9', '2025-03-17 21:02:16.313197', 901.4250000000001, 'SIM-1742216014669');
+INSERT INTO `crop_yield_history` VALUES (4, '7bf0cc80-72b3-4672-97a6-41d9618098a9', '2025-03-17 21:02:16.323201', 901.4250000000001, 'SIM-1742216014669');
 
 -- ----------------------------
 -- Table structure for environment
@@ -407,7 +489,7 @@ CREATE TABLE `environment`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FK8u5pbwyckkswy69r1jspyv9rb`(`simulation_id` ASC) USING BTREE,
   CONSTRAINT `FK8u5pbwyckkswy69r1jspyv9rb` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of environment
@@ -432,6 +514,9 @@ INSERT INTO `environment` VALUES (17, 150, 0.5, 20, '2025-03-15 20:35:35.285297'
 INSERT INTO `environment` VALUES (18, 150, 0.5, 20, '2025-03-15 20:38:16.980039', 'SIM-1742042280240', '平原', '温带季风气候', '传统农业');
 INSERT INTO `environment` VALUES (19, 200, 0.1, 15, '2025-03-16 20:49:15.438140', 'SIM-1742129341880', '平原', '温带季风气候', '传统农业');
 INSERT INTO `environment` VALUES (20, 200, 0.1, 15, '2025-03-16 20:53:04.894323', 'SIM-1742129571107', '平原', '温带季风气候', '传统农业');
+INSERT INTO `environment` VALUES (21, 200, 0.1, 15, '2025-03-17 19:56:41.111054', 'SIM-1742212589133', '平原', '温带季风气候', '传统农业');
+INSERT INTO `environment` VALUES (22, 200, 0.1, 15, '2025-03-17 20:32:56.786126', 'SIM-1742214765033', '平原', '温带季风气候', '传统农业');
+INSERT INTO `environment` VALUES (23, 200, 0.1, 15, '2025-03-17 20:53:55.656036', 'SIM-1742216014669', '平原', '温带季风气候', '传统农业');
 
 -- ----------------------------
 -- Table structure for harvest
@@ -447,7 +532,7 @@ CREATE TABLE `harvest`  (
   PRIMARY KEY (`id`) USING BTREE,
   INDEX `FKdp0nus5mrf2li4f7xi06323k3`(`simulation_id` ASC) USING BTREE,
   CONSTRAINT `FKdp0nus5mrf2li4f7xi06323k3` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of harvest
@@ -457,6 +542,14 @@ INSERT INTO `harvest` VALUES (2, '小麦', '2025-03-15 20:20:12.889970', 0, 0, '
 INSERT INTO `harvest` VALUES (3, '水稻', '2025-03-15 20:20:12.900352', 0, 0, 'SIM-1742040857118');
 INSERT INTO `harvest` VALUES (4, '苹果', '2025-03-15 20:38:23.776336', 0, 0, 'SIM-1742042280240');
 INSERT INTO `harvest` VALUES (5, '小麦', '2025-03-16 20:53:17.670675', 106.05000000000001, 901.4250000000001, 'SIM-1742129571107');
+INSERT INTO `harvest` VALUES (6, '小麦', '2025-03-17 19:56:46.004783', 106.05000000000001, 901.4250000000001, 'SIM-1742212589133');
+INSERT INTO `harvest` VALUES (7, '小麦', '2025-03-17 20:33:53.929993', 106.05000000000001, 901.4250000000001, 'SIM-1742214765033');
+INSERT INTO `harvest` VALUES (8, '小麦', '2025-03-17 20:33:53.943703', 106.05000000000001, 901.4250000000001, 'SIM-1742214765033');
+INSERT INTO `harvest` VALUES (9, '小麦', '2025-03-17 20:33:53.952702', 106.05000000000001, 901.4250000000001, 'SIM-1742214765033');
+INSERT INTO `harvest` VALUES (10, '小麦', '2025-03-17 20:33:53.962724', 106.05000000000001, 901.4250000000001, 'SIM-1742214765033');
+INSERT INTO `harvest` VALUES (11, '小麦', '2025-03-17 20:33:53.972412', 106.05000000000001, 901.4250000000001, 'SIM-1742214765033');
+INSERT INTO `harvest` VALUES (12, '小麦', '2025-03-17 20:57:25.692625', 106.05000000000001, 901.4250000000001, 'SIM-1742216014669');
+INSERT INTO `harvest` VALUES (13, '小麦', '2025-03-17 21:02:16.338709', 106.05000000000001, 901.4250000000001, 'SIM-1742216014669');
 
 -- ----------------------------
 -- Table structure for history_log
@@ -519,5 +612,58 @@ INSERT INTO `simulation` VALUES ('SIM-1742128058451', '研究畜牧业', '浙江
 INSERT INTO `simulation` VALUES ('SIM-1742129341880', '研究畜牧业', '浙江牧场', 'STOPPED', '发生寒潮了怎么办', NULL);
 INSERT INTO `simulation` VALUES ('SIM-1742129478870', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
 INSERT INTO `simulation` VALUES ('SIM-1742129571107', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742212589133', '研究畜牧业', '浙江牧场', 'STOPPED', '发生干旱怎么办', NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742214765033', '研究畜牧业', '浙江牧场', 'STOPPED', '', NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742216014669', '研究畜牧业', '浙江牧场', 'STOPPED', '发生干旱怎么办', NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368645120', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368653457', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368654098', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368655309', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368655890', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368810903', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368811496', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368811886', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812065', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812232', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812390', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812529', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812698', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368812869', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368813149', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368820702', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368820888', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821071', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821224', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821389', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821546', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821694', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821809', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368821973', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822132', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822272', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822444', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822588', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822751', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368822917', '研究畜牧业', '浙江牧场', 'STOPPED', NULL, NULL);
+INSERT INTO `simulation` VALUES ('SIM-1742368830161', '1', '1', 'STOPPED', NULL, NULL);
+
+-- ----------------------------
+-- Table structure for user_goal
+-- ----------------------------
+DROP TABLE IF EXISTS `user_goal`;
+CREATE TABLE `user_goal`  (
+  `id` bigint NOT NULL AUTO_INCREMENT,
+  `crop_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `target_yield` double NOT NULL,
+  `timestamp` datetime(6) NULL DEFAULT NULL,
+  `simulation_id` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `FK41kos14qvr196n286hn5y933s`(`simulation_id` ASC) USING BTREE,
+  CONSTRAINT `FK41kos14qvr196n286hn5y933s` FOREIGN KEY (`simulation_id`) REFERENCES `simulation` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of user_goal
+-- ----------------------------
 
 SET FOREIGN_KEY_CHECKS = 1;

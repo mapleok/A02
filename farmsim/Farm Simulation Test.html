@@ -1,144 +1,412 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>农业模拟系统测试页面</title>
+    <title>农业模拟系统</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            padding: 0;
-            background-color: #f4f4f9;
         }
 
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
+        .section {
+            margin-bottom: 30px;
             padding: 20px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        h1 {
-            text-align: center;
-            color: #333;
+        .crop-section {
+            background-color: #f0fff0;
+            border-color: #90ee90;
+        }
+
+        .section h2 {
+            margin-top: 0;
         }
 
         .form-group {
             margin-bottom: 15px;
         }
 
-        label {
+        .form-group label {
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
         }
 
-        input[type="text"],
-        textarea {
+        .form-group input {
             width: 100%;
             padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 14px;
+            box-sizing: border-box;
         }
 
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
         }
 
-        button:hover {
-            background-color: #218838;
+        .form-group button:hover {
+            background-color: #0056b3;
         }
 
         .response {
             margin-top: 20px;
-            padding: 15px;
-            background-color: #f8f9fa;
+            padding: 10px;
+            background-color: #f9f9f9;
             border: 1px solid #ddd;
-            border-radius: 4px;
+            border-radius: 5px;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>农业模拟系统测试页面</h1>
+    <h1>农业模拟系统</h1>
 
-        <!-- 用户输入表单 -->
+    <!-- 创建模拟 -->
+    <div class="section">
+        <h2>创建模拟</h2>
         <div class="form-group">
-            <label for="prompt">输入问题（可选）：</label>
-            <textarea id="prompt" rows="3" placeholder="请输入您的问题..."></textarea>
+            <label for="simulationName">模拟名称</label>
+            <input type="text" id="simulationName" placeholder="输入模拟名称">
         </div>
-
         <div class="form-group">
-            <label for="cropType">作物类型（可选）：</label>
-            <input type="text" id="cropType" placeholder="例如：小麦">
+            <label for="simulationDescription">模拟描述</label>
+            <input type="text" id="simulationDescription" placeholder="输入模拟描述">
         </div>
-
         <div class="form-group">
-            <label for="targetYield">目标产量（可选）：</label>
-            <input type="text" id="targetYield" placeholder="例如：500">
+            <button onclick="createSimulation()">创建模拟</button>
         </div>
-
-        <button onclick="submitRequest()">提交</button>
-
-        <!-- 展示 Agent 的决策结果 -->
-        <div class="response">
-            <h2>Agent 决策结果：</h2>
-            <pre id="responseOutput">等待结果...</pre>
-        </div>
+        <div class="response" id="createSimulationResponse"></div>
     </div>
 
-    <script>
-        // 提交请求的函数
-        function submitRequest() {
-            const prompt = document.getElementById('prompt').value;
-            const cropType = document.getElementById('cropType').value;
-            const targetYield = document.getElementById('targetYield').value;
+    <!-- 创建代理 -->
+    <div class="section">
+        <h2>创建代理</h2>
+        <div class="form-group">
+            <label for="agentName">代理名称</label>
+            <input type="text" id="agentName" placeholder="输入代理名称">
+        </div>
+        <div class="form-group">
+            <label for="simulationIdForAgent">模拟 ID</label>
+            <input type="text" id="simulationIdForAgent" placeholder="输入模拟 ID">
+        </div>
+        <div class="form-group">
+            <button onclick="createAgent()">创建代理</button>
+        </div>
+        <div class="response" id="createAgentResponse"></div>
+    </div>
 
-            // 构建请求体
-            const requestBody = {};
-            if (prompt) {
-                requestBody.prompt = prompt;
-            }
-            if (cropType && targetYield) {
-                requestBody.goal = {
-                    cropType: cropType,
-                    targetYield: parseFloat(targetYield)
-                };
-            }
+    <!DOCTYPE html>
+    <html lang="en">
 
-            // 发送请求
-            fetch('http://localhost:8080/api/glm/chat', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestBody)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    // 展示结果
-                    document.getElementById('responseOutput').textContent = JSON.stringify(data, null, 2);
-                })
-                .catch(error => {
-                    console.error('请求失败：', error);
-                    document.getElementById('responseOutput').textContent = '请求失败，请检查控制台日志。';
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>农业模拟系统（含天气管理）</title>
+        <style>
+            /* 保持原有样式不变，新增天气模块样式 */
+            .weather-section {
+                background-color: #e6f7ff;
+                border-color: #80d4ff;
+            }
+        </style>
+    </head>
+
+    <body>
+        <h1>农业模拟系统</h1>
+
+        <!-- 新增天气管理模块 -->
+        <div class="section weather-section">
+            <h2>天气管理</h2>
+
+            <!-- 创建/更新天气 -->
+            <div class="form-group">
+                <label for="simulationIdForWeather">模拟 ID</label>
+                <input type="text" id="simulationIdForWeather" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <label for="temperature">温度 (℃)</label>
+                <input type="number" id="temperature" step="0.1" placeholder="-50 ~ 50">
+            </div>
+            <div class="form-group">
+                <label for="precipitation">降水量 (mm)</label>
+                <input type="number" id="precipitation" step="1" placeholder="≥ 0">
+            </div>
+            <div class="form-group">
+                <label for="soilFertility">土壤肥力 (%)</label>
+                <input type="number" id="soilFertility" step="1" placeholder="0 ~ 100">
+            </div>
+            <div class="form-group">
+                <button onclick="updateWeather()">更新天气</button>
+                <button onclick="getCurrentWeather()" style="background-color: #28a745">获取当前天气</button>
+                <button onclick="randomizeWeather()" style="background-color: #ffc107">随机变化天气</button>
+            </div>
+            <div class="response" id="weatherResponse"></div>
+        </div>
+
+        <div class="section crop-section">
+            <h2>作物管理</h2>
+
+            <!-- 创建作物 -->
+            <div class="form-group">
+                <label for="simulationIdForCrop">模拟 ID</label>
+                <input type="text" id="simulationIdForCrop" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <label for="cropName">作物名称</label>
+                <input type="text" id="cropName" placeholder="输入作物名称">
+            </div>
+            <div class="form-group">
+                <label for="growthRate">生长率</label>
+                <input type="number" id="growthRate" step="0.1" placeholder="0.1 ~ 2.0">
+            </div>
+            <div class="form-group">
+                <label for="tempWeight">温度权重</label>
+                <input type="number" id="tempWeight" step="0.1" placeholder="0.0 ~ 1.0">
+            </div>
+            <div class="form-group">
+                <label for="soilWeight">土壤权重</label>
+                <input type="number" id="soilWeight" step="0.1" placeholder="0.0 ~ 1.0">
+            </div>
+            <div class="form-group">
+                <label for="waterWeight">水分权重</label>
+                <input type="number" id="waterWeight" step="0.1" placeholder="0.0 ~ 1.0">
+            </div>
+            <div class="form-group">
+                <button onclick="createCrop()">创建作物</button>
+            </div>
+            <div class="response" id="createCropResponse"></div>
+
+            <!-- 查看作物列表 -->
+            <div class="form-group">
+                <label for="simulationIdForCropList">模拟 ID</label>
+                <input type="text" id="simulationIdForCropList" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <button onclick="getCropList()">查看作物列表</button>
+            </div>
+            <div class="response" id="cropListResponse"></div>
+
+            <!-- 查看作物产量历史 -->
+            <div class="form-group">
+                <label for="simulationIdForCropHistory">模拟 ID</label>
+                <input type="text" id="simulationIdForCropHistory" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <label for="cropIdForHistory">作物 ID</label>
+                <input type="text" id="cropIdForHistory" placeholder="输入作物 ID">
+            </div>
+            <div class="form-group">
+                <button onclick="getCropYieldHistory()">查看产量历史</button>
+            </div>
+            <div class="response" id="cropYieldHistoryResponse"></div>
+        </div>
+
+        <!-- 启动对话 -->
+        <div class="section">
+            <h2>启动对话</h2>
+            <div class="form-group">
+                <label for="simulationIdForDialogue">模拟 ID</label>
+                <input type="text" id="simulationIdForDialogue" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <label for="dialoguePrompt">对话提示</label>
+                <input type="text" id="dialoguePrompt" placeholder="输入对话提示">
+            </div>
+            <div class="form-group">
+                <button onclick="startDialogue()">启动对话</button>
+            </div>
+            <div class="response" id="startDialogueResponse"></div>
+        </div>
+
+        <!-- 获取对话历史 -->
+        <div class="section">
+            <h2>获取对话历史</h2>
+            <div class="form-group">
+                <label for="simulationIdForHistory">模拟 ID</label>
+                <input type="text" id="simulationIdForHistory" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <button onclick="getDialogueHistory()">获取历史</button>
+            </div>
+            <div class="response" id="dialogueHistoryResponse"></div>
+        </div>
+
+        <!-- 结束模拟 -->
+        <div class="section">
+            <h2>结束模拟</h2>
+            <div class="form-group">
+                <label for="simulationIdToEnd">模拟 ID</label>
+                <input type="text" id="simulationIdToEnd" placeholder="输入模拟 ID">
+            </div>
+            <div class="form-group">
+                <button onclick="endSimulation()">结束模拟</button>
+            </div>
+            <div class="response" id="endSimulationResponse"></div>
+        </div>
+
+        <script>
+            const baseUrl = "http://localhost:8080/api";
+
+            // 创建模拟
+            async function createSimulation() {
+                const name = document.getElementById("simulationName").value;
+                const description = document.getElementById("simulationDescription").value;
+                const response = await fetch(`${baseUrl}/simulation`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, description })
                 });
-        }
-    </script>
+                const data = await response.json();
+                document.getElementById("createSimulationResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            // 创建代理
+            async function createAgent() {
+                const agentName = document.getElementById("agentName").value;
+                const simulationId = document.getElementById("simulationIdForAgent").value;
+                const response = await fetch(`${baseUrl}/agent`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ agentName, simulationId })
+                });
+                const data = await response.json();
+                document.getElementById("createAgentResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            // 启动对话
+            async function startDialogue() {
+                const simulationId = document.getElementById("simulationIdForDialogue").value;
+                const prompt = document.getElementById("dialoguePrompt").value;
+                const response = await fetch(`${baseUrl}/simulation/${simulationId}/start-dialogue`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ prompt })
+                });
+                const data = await response.json();
+                document.getElementById("startDialogueResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            // 获取对话历史
+            async function getDialogueHistory() {
+                const simulationId = document.getElementById("simulationIdForHistory").value;
+                const response = await fetch(`${baseUrl}/simulation/${simulationId}/dialogue-history`);
+                const data = await response.json();
+                document.getElementById("dialogueHistoryResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            // 结束模拟
+            async function endSimulation() {
+                const simulationId = document.getElementById("simulationIdToEnd").value;
+                const response = await fetch(`${baseUrl}/simulation/${simulationId}/end`, {
+                    method: "POST"
+                });
+                const data = await response.text();
+                document.getElementById("endSimulationResponse").innerText = data;
+            }
+        </script>
+
+        <script>
+            // 新增天气管理相关函数
+            async function updateWeather() {
+                const simulationId = document.getElementById("simulationIdForWeather").value;
+                const temperature = parseFloat(document.getElementById("temperature").value);
+                const precipitation = parseFloat(document.getElementById("precipitation").value);
+                const soilFertility = parseFloat(document.getElementById("soilFertility").value);
+
+                const response = await fetch(`${baseUrl}/environment`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        simulationId,
+                        temperature,
+                        precipitation,
+                        soilFertility: soilFertility / 100, // 转换为小数
+                        terrain: "平原",    // 示例固定值
+                        climate: "温带季风气候",
+                        agriculturalTechnology: "传统农业"
+                    })
+                });
+                const data = await response.json();
+                document.getElementById("weatherResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            async function getCurrentWeather() {
+                const simulationId = document.getElementById("simulationIdForWeather").value;
+                const response = await fetch(`${baseUrl}/environments/latest?simulationId=${simulationId}`);
+                const data = await response.json();
+
+                // 格式化显示
+                const weatherInfo = `
+                        当前环境：
+                        温度: ${data.temperature}℃
+                        降水量: ${data.precipitation}mm
+                        土壤肥力: ${(data.soilFertility * 100).toFixed(1)}%
+                        地形: ${data.terrain}
+                        气候: ${data.climate}
+                    `;
+                document.getElementById("weatherResponse").innerText = weatherInfo;
+            }
+
+            async function randomizeWeather() {
+                const simulationId = document.getElementById("simulationIdForWeather").value;
+                const response = await fetch(`${baseUrl}/simulation/${simulationId}/random-weather`, {
+                    method: "POST"
+                });
+                const data = await response.json();
+                document.getElementById("weatherResponse").innerText = JSON.stringify(data, null, 2);
+            }
+        </script>
+
+        <script>
+            // 新增作物管理相关函数
+            async function createCrop() {
+                const simulationId = document.getElementById("simulationIdForCrop").value;
+                const cropName = document.getElementById("cropName").value;
+                const growthRate = parseFloat(document.getElementById("growthRate").value);
+                const tempWeight = parseFloat(document.getElementById("tempWeight").value);
+                const soilWeight = parseFloat(document.getElementById("soilWeight").value);
+                const waterWeight = parseFloat(document.getElementById("waterWeight").value);
+
+                const response = await fetch(`${baseUrl}/crop`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        cropName,
+                        growthRate,
+                        tempWeight,
+                        soilWeight,
+                        waterWeight,
+                        simulationId
+                    })
+                });
+                const data = await response.json();
+                document.getElementById("createCropResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            async function getCropList() {
+                const simulationId = document.getElementById("simulationIdForCropList").value;
+                const response = await fetch(`${baseUrl}/crops?simulationId=${simulationId}`);
+                const data = await response.json();
+                document.getElementById("cropListResponse").innerText = JSON.stringify(data, null, 2);
+            }
+
+            async function getCropYieldHistory() {
+                const simulationId = document.getElementById("simulationIdForCropHistory").value;
+                const cropId = document.getElementById("cropIdForHistory").value;
+                const response = await fetch(`${baseUrl}/crop-yield-history/${cropId}/${simulationId}`);
+                const data = await response.json();
+                document.getElementById("cropYieldHistoryResponse").innerText = JSON.stringify(data, null, 2);
+            }
+        </script>
+    </body>
 </body>
 
 </html>

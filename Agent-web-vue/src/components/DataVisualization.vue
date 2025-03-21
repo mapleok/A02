@@ -1,25 +1,30 @@
 <template>
+  <div class="section">
+    <h2>农业收成数据</h2>
+    <button @click="handleGetHarvestData" class="generate-button">获取收成数据</button>
+    <pre>{{ harvestResult }}</pre>
+  </div>
   <div class="container">
+
     <!-- 第一行：柱状图和折线图 -->
     <div class="row">
       <div class="chart-container">
-        <h3>柱状图</h3>
+        <h3>作物产量</h3>
         <div ref="barChartRef" class="chart"></div>
       </div>
       <div class="chart-container">
-        <h3>折线图</h3>
+        <h3>收益走线图</h3>
         <div ref="lineChartRef" class="chart"></div>
       </div>
     </div>
-
     <!-- 第二行：饼状图和堆叠柱状图 -->
     <div class="row">
       <div class="chart-container">
-        <h3>饼状图</h3>
+        <h3>作物种类</h3>
         <div ref="pieChartRef" class="chart"></div>
       </div>
       <div class="chart-container">
-        <h3>堆叠柱状图</h3>
+        <h3>产量对比图</h3>
         <div ref="stackedBarChartRef" class="chart"></div>
       </div>
     </div>
@@ -27,7 +32,7 @@
     <!-- 第三行：双Y轴折线图和嵌套饼图 -->
     <div class="row">
       <div class="chart-container">
-        <h3>双Y轴折线图</h3>
+        <h3>收益对比图</h3>
         <div ref="doubleYLineChartRef" class="chart"></div>
       </div>
       <div class="chart-container">
@@ -41,6 +46,22 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import * as echarts from 'echarts'
+
+import {
+getHarvestData,
+} from '../api/index'
+
+// 农业收成数据
+const harvestSimId = ref('')
+const harvestResult = ref('')
+
+
+// 获取收成数据
+const handleGetHarvestData = async () => {
+  const result = await getHarvestData(harvestSimId.value)
+  harvestResult.value = JSON.stringify(result, null, 2)
+}
+
 
 // 模拟数据
 // 柱状图数据：不同作物每周的产量
@@ -443,4 +464,21 @@ watch([barData, lineData, pieData, stackedBarData, doubleYLineData, nestedPieDat
   width: 100%;
   height: 300px;
 }
+
+.generate-button,
+.btn {
+  padding:  10px 10px ;
+  background-color: #006400; /* 墨绿色按钮 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+}
+.generate-button:hover,
+.btn:hover {
+  background-color: #004d00; /* 深一点的墨绿色悬停效果 */
+}
+
 </style>

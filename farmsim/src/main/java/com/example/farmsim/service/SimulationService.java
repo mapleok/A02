@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.farmsim.repository.CropYieldHistoryRepo;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -38,6 +39,9 @@ public class SimulationService {
     @Autowired
     private CropYieldHistoryRepo cropYieldHistoryRepo;// 新增
 
+    @Autowired
+    private AgentService agentService;
+
     // 获取模拟
     public Simulation getSimulationById(String simulationId) {
         return simulationRepo.findById(simulationId)
@@ -52,6 +56,10 @@ public class SimulationService {
             simulation.setName(dto.getName());
             simulation.setDescription(dto.getDescription());
             simulation.setStatus(SimulationStatus.STOPPED);
+
+            // 设置模拟开始日期为当前日期
+            simulation.setStartDate(LocalDate.now());
+
             simulationRepo.save(simulation);
             return simulation.getId();
         } catch (Exception e) {
@@ -80,6 +88,11 @@ public class SimulationService {
 
         // 2. 计算收成数据
         calculateHarvest(simulationId);
+
+        boolean expertModeEnabled = simulation.getAgents().stream()
+                .anyMatch(agent -> "AGRONOMIST".equals(agent.getRoleType()));
+        harvestService.calculateRevenue(simulationId, expertModeEnabled);
+
 
         // 3. 记录日志
         System.out.println("模拟已结束，收成数据已计算并保存。");
@@ -163,6 +176,7 @@ public class SimulationService {
 
         // 保存更新后的环境数据
         environmentRepo.save(latestEnv);
+        agentService.triggerEnvironmentResponse(simulationId, latestEnv);
         cropRepo.saveAll(crops);
     }
 

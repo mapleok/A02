@@ -2,6 +2,8 @@ package com.example.farmsim.service;
 
 import com.example.farmsim.model.entity.*;
 import com.example.farmsim.repository.*;
+import com.example.farmsim.websocket.Message;
+import com.example.farmsim.websocket.WebSocketHandler;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -9,10 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -46,6 +45,13 @@ public class AgentService {
 
     @Autowired
     private UserGoalRepo userGoalRepo;
+
+    @Autowired
+    private WebSocketHandler webSocketHandler;
+
+    @Autowired
+    private OptimizationActionRepo optimizationActionRepo;
+
 
 
     /**
@@ -154,18 +160,13 @@ public class AgentService {
 
 
     private String buildEnvironmentSummary(Environment env, List<Crop> crops) {
-        StringBuilder summary = new StringBuilder("当前环境数据：\n");
-        summary.append("- 温度：").append(env.getTemperature()).append("℃\n");
-        summary.append("- 土壤肥力：").append(env.getSoilFertility() * 100).append("%\n");
-        summary.append("- 降水量：").append(env.getPrecipitation()).append("mm\n");
-
-        summary.append("当前作物数据：\n");
-        for (Crop crop : crops) {
-            summary.append("- ").append(crop.getCropName())
-                    .append("（生长率：").append(crop.getGrowthRate()).append("）\n");
-        }
-
-        return summary.toString();
+        return String.format(
+                "温度 %.1f℃, 土壤肥力 %.0f%%, 降水量 %.1fmm, 作物: %s",
+                env.getTemperature(),
+                env.getSoilFertility() * 100,
+                env.getPrecipitation(),
+                crops.stream().map(Crop::getCropName).collect(Collectors.joining(", "))
+        );
     }
 
     private double calculateCropYield(Crop crop, Environment env) {
@@ -175,7 +176,6 @@ public class AgentService {
                 (1 + env.getPrecipitation() * crop.getWaterWeight());
     }
 
-    // src/main/java/com/example/farmsim/service/AgentService.java
     public String handleUserGoal(String simulationId, Map<String, Object> goal) {
         try {
             // 1. 保存用户目标
@@ -226,7 +226,6 @@ public class AgentService {
         return advice.toString();
     }
 
-    // src/main/java/com/example/farmsim/service/AgentService.java
     public String generateAutomaticDecision(String simulationId) {
         Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
         List<Crop> crops = cropRepo.findBySimulationId(simulationId);
@@ -246,6 +245,18 @@ public class AgentService {
 
         // 触发自动执行优化指令
         executeAutomaticCommands(simulationId, advice.toString());
+
+        // 构建 WebSocket 消息
+        Message message = new Message();
+        message.setType("agent-automatic-decision");
+        message.setContent("Agent 自动决策完成");
+        message.setSimulationId(simulationId);
+        message.setData(Map.of(
+                "advice", advice.toString()
+        ));
+
+        // 通过 WebSocket 发送消息
+        webSocketHandler.broadcastMessage(message);
 
         return advice.toString();
     }
@@ -305,17 +316,84 @@ public class AgentService {
                 command.setParameters(jsonCommand); // 保存完整 JSON 指令
                 command.setTimestamp(LocalDateTime.now());
                 command.setSimulation(simulation);
-                agentCommandRepo.save(command); // 需要注入 AgentCommandRepo
+                agentCommandRepo.save(command);
             }
 
             // 5. 构造 JSON 响应
-            return "{\"commands\": [" +
+            String jsonResponse = "{\"commands\": [" +
                     allCommands.stream()
                             .map(cmd -> "\"" + cmd.replace("\"", "\\\"") + "\"")
                             .collect(Collectors.joining(",")) +
                     "]}";
+
+            // 6. 构建 WebSocket 消息
+            Message message = new Message();
+            message.setType("json-command");
+            message.setSimulationId(simulationId);
+            message.setContent("JSON 指令生成成功");
+            message.setData(Map.of(
+                    "commands", allCommands // 发送完整的指令列表
+            ));
+
+            // 7. 通过 WebSocket 广播消息
+            webSocketHandler.broadcastMessage(message);
+
+            // 8. 返回 JSON 响应
+            return jsonResponse;
         } catch (Exception e) {
+            // 错误处理
+            Message errorMessage = new Message();
+            errorMessage.setType("error");
+            errorMessage.setSimulationId(simulationId);
+            errorMessage.setContent("生成 JSON 指令失败");
+            errorMessage.setData(Map.of(
+                    "reason", e.getMessage()
+            ));
+            webSocketHandler.broadcastMessage(errorMessage);
+
             throw new RuntimeException("生成 JSON 指令失败: " + e.getMessage());
+        }
+    }
+
+    public String startAutoDialogue(String simulationId) {
+        try {
+            // 1. 获取模拟的环境数据
+            Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+            List<Crop> crops = cropRepo.findBySimulationId(simulationId);
+
+            // 2. 构建对话上下文
+            List<Map<String, String>> messages = new ArrayList<>();
+            messages.add(Map.of("role", "system", "content",
+                    "你是一个农业专家，请根据当前环境讨论下一步计划。当前环境：" + buildEnvironmentSummary(env, crops)));
+
+            // 3. 遍历每个 Agent 生成对话
+            List<Agent> agents = agentRepo.findBySimulationId(simulationId);
+            StringBuilder dialogueLog = new StringBuilder();
+            for (Agent agent : agents) {
+                // 3.1 生成角色特定的提示
+                String rolePrompt = buildRolePrompt(agent.getRoleType(), messages);
+                messages.add(Map.of("role", "user", "content", rolePrompt));
+
+                // 3.2 调用大模型生成回复
+                String response = glmService.getResponseFromGLM(messages);
+                dialogueLog.append(agent.getAgentName()).append(": ").append(response).append("\n");
+
+                // 3.3 推送对话到 Unity
+                Message message = new Message();
+                message.setType("auto-dialogue");
+                message.setSimulationId(simulationId);
+                message.setData(Map.of(
+                        "agentId", agent.getAgentId(),
+                        "content", response
+                ));
+                webSocketHandler.broadcastMessage(message);
+
+                // 3.4 更新对话上下文
+                messages.add(Map.of("role", "assistant", "content", response));
+            }
+            return dialogueLog.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("自动对话失败: " + e.getMessage());
         }
     }
 
@@ -328,6 +406,32 @@ public class AgentService {
             throw new RuntimeException("解析 JSON 指令失败: " + e.getMessage());
         }
     }
+
+    public void optimizeIrrigation(String simulationId) {
+        Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+        List<Crop> crops = cropRepo.findBySimulationId(simulationId);
+
+        for (Crop crop : crops) {
+            double requiredWater = crop.getWaterWeight() * 100; // 假设作物需水量为 waterWeight * 100
+            double currentWater = env.getPrecipitation();
+
+            if (currentWater < requiredWater) {
+                double irrigationAmount = requiredWater - currentWater;
+                applyIrrigation(simulationId, crop.getCropId(), irrigationAmount);
+            }
+        }
+    }
+
+    private void applyIrrigation(String simulationId, String cropId, double amount) {
+        // 更新环境数据
+        Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+        env.setPrecipitation(env.getPrecipitation() + amount);
+        environmentRepo.save(env);
+
+        // 记录优化操作
+        recordOptimizationAction(simulationId, "irrigation", cropId, amount);
+    }
+
 
     /**
      * 构建角色提示（不包含 JSON 指令）
@@ -353,6 +457,27 @@ public class AgentService {
         }
 
         return String.format("%s\n【最新发言】%s\n你的回应：", roleSpecificPrompt, lastMessage);
+    }
+
+    public void triggerEnvironmentResponse(String simulationId, Environment env) {
+        List<Agent> agents = agentRepo.findBySimulationId(simulationId);
+        for (Agent agent : agents) {
+            String prompt = String.format("环境已变化：温度 %.1f℃，土壤肥力 %.0f%%。请提出应对措施。",
+                    env.getTemperature(), env.getSoilFertility() * 100);
+            String response = glmService.getResponseFromGLM(List.of(
+                    Map.of("role", "user", "content", prompt)
+            ));
+
+            // 推送消息到 Unity
+            Message message = new Message();
+            message.setType("environment-response");
+            message.setSimulationId(simulationId);
+            message.setData(Map.of(
+                    "agentId", agent.getAgentId(),
+                    "content", response
+            ));
+            webSocketHandler.broadcastMessage(message);
+        }
     }
 
     /**
@@ -395,6 +520,8 @@ public class AgentService {
                 "||JSON_END||";
     }
 
+
+
     /**
      * 从大模型响应中提取 JSON
      */
@@ -420,6 +547,16 @@ public class AgentService {
         } catch (Exception e) {
             throw new IllegalArgumentException("响应中未找到有效 JSON");
         }
+    }
+
+    private void recordOptimizationAction(String simulationId, String actionType, String target, double amount) {
+        OptimizationAction action = new OptimizationAction();
+        action.setSimulationId(simulationId);
+        action.setActionType(actionType);
+        action.setTarget(target);
+        action.setAmount(amount);
+        action.setTimestamp(LocalDateTime.now());
+        optimizationActionRepo.save(action);
     }
 
     /**
@@ -462,25 +599,144 @@ public class AgentService {
     }
 
     public void createAgent(String agentName, String simulationId) {
-        try {
-            // 1. 根据 simulationId 查找 Simulation 对象
-            Simulation simulation = simulationRepo.findById(simulationId)
-                    .orElseThrow(() -> new RuntimeException("模拟不存在: " + simulationId));
+        Agent agent = new Agent();
+        agent.setAgentId("AGENT-" + System.currentTimeMillis());
+        agent.setRoleType("FARMER");
 
-            // 2. 创建 Agent 并设置关联
-            Agent agent = new Agent();
-            agent.setAgentId("AGENT-" + System.currentTimeMillis()); // 生成唯一 ID
-            agent.setAgentName(agentName);
-            agent.setRoleType("FARMER"); // 默认角色
-            agent.setSimulation(simulation);
+        // 随机生成能力值（0.3~0.7）
+        agent.setPlantingSkill(0.3 + Math.random() * 0.4);
+        agent.setLearningAbility(0.3 + Math.random() * 0.4);
+        agent.setLocalKnowledge(0.3 + Math.random() * 0.4);
 
-            // 3. 保存 Agent
-            agentRepo.save(agent);
-        } catch (Exception e) {
-            throw new RuntimeException("创建 Agent 失败: " + e.getMessage());
+        // 根据本地知识确定可访问的数据类型
+        List<String> accessibleData = new ArrayList<>();
+        if (agent.getLocalKnowledge() > 0.5) accessibleData.add("temperature");
+        if (agent.getLocalKnowledge() > 0.6) accessibleData.add("soil");
+        agent.setAccessibleData(accessibleData);
+
+        agentRepo.save(agent);
+    }
+
+    public Map<String, Object> getGlobalData(String simulationId) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("environment", environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId));
+        data.put("crops", cropRepo.findBySimulationId(simulationId));
+        data.put("agents", agentRepo.findBySimulationId(simulationId));
+        return data;
+    }
+
+    public void optimizeFertilization(String simulationId) {
+        Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+        List<Crop> crops = cropRepo.findBySimulationId(simulationId);
+
+        for (Crop crop : crops) {
+            double requiredFertility = crop.getSoilWeight() * 0.8; // 假设作物需求为 soilWeight * 0.8
+            double currentFertility = env.getSoilFertility();
+
+            if (currentFertility < requiredFertility) {
+                double fertilizerAmount = requiredFertility - currentFertility;
+                applyFertilizer(simulationId, crop.getCropId(), fertilizerAmount);
+            }
         }
     }
 
+
+    private void applyFertilizer(String simulationId, String cropId, double amount) {
+        // 更新环境数据
+        Environment env = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+        env.setSoilFertility(env.getSoilFertility() + amount);
+        environmentRepo.save(env);
+
+        // 记录优化操作
+        recordOptimizationAction(simulationId, "fertilization", cropId, amount);
+    }
+
+    public void optimizeResourceAllocation(String simulationId) {
+
+        optimizeIrrigation(simulationId);
+        optimizeFertilization(simulationId);
+        // 1. 获取全局数据
+        Map<String, Object> globalData = getGlobalData(simulationId);
+        List<Agent> farmers = (List<Agent>) globalData.get("agents");
+        List<Crop> crops = (List<Crop>) globalData.get("crops");
+
+        // 2. 根据农民能力分配作物
+        farmers.sort((a, b) -> Double.compare(b.getPlantingSkill(), a.getPlantingSkill()));
+        crops.sort((a, b) -> Double.compare(b.getGrowthRate(), a.getGrowthRate()));
+
+        // 3. 高技能农民负责高价值作物
+        for (int i = 0; i < Math.min(farmers.size(), crops.size()); i++) {
+            assignCropToFarmer(farmers.get(i).getAgentId(), crops.get(i).getCropId());
+        }
+    }
+
+    public void triggerAgentDialogue(String simulationId) {
+        List<Agent> agents = agentRepo.findBySimulationId(simulationId);
+        List<Agent> farmers = agents.stream()
+                .filter(a -> a.getRoleType().equals("FARMER"))
+                .collect(Collectors.toList());
+        Optional<Agent> expert = agents.stream()
+                .filter(a -> a.getRoleType().equals("AGRONOMIST"))
+                .findFirst();
+
+        // 农民之间对话
+        farmers.forEach(farmer -> {
+            String farmerDialogue = generateFarmerDialogue(farmer);
+            sendDialogueMessage(simulationId, farmer.getAgentId(), farmerDialogue);
+        });
+
+        // 专家指导农民
+        expert.ifPresent(e -> {
+            farmers.forEach(farmer -> {
+                String advice = generateExpertAdvice(e, farmer);
+                sendDialogueMessage(simulationId, e.getAgentId(), advice);
+            });
+        });
+    }
+
+    private String generateFarmerDialogue(Agent farmer) {
+        // 根据农民的知识生成对话
+        return String.format("农民 %s: 我注意到土壤湿度是 %.1f%%，可能需要调整灌溉。",
+                farmer.getAgentName(), farmer.getLocalKnowledge() * 100);
+    }
+
+    private String generateExpertAdvice(Agent expert, Agent farmer) {
+        // 生成专家建议
+        return String.format("专家 %s ➔ 农民 %s: 根据你的地块数据，建议增加10%%的施肥量。",
+                expert.getAgentName(), farmer.getAgentName());
+    }
+
+    private void sendDialogueMessage(String simId, String agentId, String content) {
+        Message message = new Message();
+        message.setType("agent-dialogue");
+        message.setSimulationId(simId);
+        message.setData(Map.of(
+                "agentId", agentId,
+                "content", content,
+                "timestamp", LocalDateTime.now().toString()
+        ));
+        webSocketHandler.broadcastMessage(message);
+    }
+
+    private void assignCropToFarmer(String farmerId, String cropId) {
+        // 更新数据库或发送指令到Agent
+        System.out.println("分配作物 " + cropId + " 给农民 " + farmerId);
+    }
+
+    public void createAgronomist(String simulationId) {
+        // 创建专家Agent
+        Agent expert = new Agent();
+        expert.setAgentId("EXPERT-" + System.currentTimeMillis());
+        expert.setRoleType("AGRONOMIST");
+        expert.setPlantingSkill(1.0);
+        expert.setLearningAbility(1.0);
+        expert.setLocalKnowledge(1.0);
+        expert.setAccessibleData(List.of("temperature", "soil", "crops", "agents"));
+        agentRepo.save(expert);
+
+        // 调用资源分配优化
+        optimizeResourceAllocation(simulationId);
+    }
     public String makeDecision(String agentId, String prompt) {
         try {
             // 1. 查找 Agent
@@ -495,10 +751,24 @@ public class AgentService {
             // 3. 调用大模型生成回复
             String response = glmService.getResponseFromGLM(messages);
 
-            // 4. 保存对话记录（可选）
+            // 4. 保存对话记录
             saveDialogue(agent.getSimulation().getId(), agentId, agent.getRoleType(), response);
 
-            // 5. 返回生成的回复
+            // 5. 构建 WebSocket 消息
+            Message message = new Message();
+            message.setType("agent-decision");
+            message.setContent("Agent 决策完成");
+            message.setSimulationId(agent.getSimulation().getId());
+            message.setData(Map.of(
+                    "agentId", agent.getAgentId(),
+                    "agentName", agent.getAgentName(),
+                    "decision", response
+            ));
+
+            // 6. 通过 WebSocket 发送消息
+            webSocketHandler.broadcastMessage(message);
+
+            // 7. 返回生成的回复
             return response;
         } catch (Exception e) {
             throw new RuntimeException("Agent 决策失败: " + e.getMessage());

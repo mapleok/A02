@@ -28,46 +28,12 @@
       style="margin-top: 20px"
     />
   </div>
-
-  <!--  <div>-->
-  <!--    &lt;!&ndash; 创建模拟相关 &ndash;&gt;-->
-  <!--    <h2>创建模拟</h2>-->
-  <!--    <input id="simName" type="text" placeholder="模拟名称" />-->
-  <!--    <input id="simDesc" type="text" placeholder="模拟描述" />-->
-  <!--    <button @click="createSimulation">创建模拟</button>-->
-  <!--    <div id="simResult"></div>-->
-
-  <!--    &lt;!&ndash; 创建Agent相关 &ndash;&gt;-->
-  <!--    <h2>创建Agent</h2>-->
-  <!--    <input id="agentName" type="text" placeholder="Agent名称" />-->
-  <!--    <select id="agentRole">-->
-  <!--      <option value="role1">角色1</option>-->
-  <!--      <option value="role2">角色2</option>-->
-  <!--    </select>-->
-  <!--    <button @click="createAgent">创建Agent</button>-->
-  <!--    <div id="agentResult"></div>-->
-
-  <!--    &lt;!&ndash; 创建作物相关 &ndash;&gt;-->
-  <!--    <h2>创建作物</h2>-->
-  <!--    <input id="cropName" type="text" placeholder="作物名称" />-->
-  <!--    <input id="growthRate" type="number" placeholder="生长速率" />-->
-  <!--    <button @click="createCrop">创建作物</button>-->
-  <!--    <div id="cropResult"></div>-->
-
-  <!--    &lt;!&ndash; WebSocket状态显示 &ndash;&gt;-->
-  <!--    <p>WebSocket状态: <span id="wsStatus"></span></p>-->
-
-  <!--    &lt;!&ndash; 对话相关 &ndash;&gt;-->
-  <!--    <h2>对话</h2>-->
-  <!--    <div id="dialogueHistory"></div>-->
-  <!--    <input id="promptInput" type="text" placeholder="输入指令" />-->
-  <!--    <button @click="sendPrompt">发送指令</button>-->
-
-  <!--    &lt;!&ndash; 获取环境数据相关 &ndash;&gt;-->
-  <!--    <h2>环境数据</h2>-->
-  <!--    <button @click="getLatestEnvironment">获取最新环境数据</button>-->
-  <!--    <div id="envData"></div>-->
-  <!--  </div>-->
+  <!-- WebSocket 测试 -->
+  <div class="section">
+    <h2>WebSocket 测试</h2>
+    <button @click="connectWebSocket" class="generate-button">连接 WebSocket</button>
+    <div id="wsLog">{{ wsLog }}</div>
+  </div>
 </template>
 
 <script setup>
@@ -159,87 +125,60 @@ const handleCurrentChange = (newPage) => {
   currentPage.value = newPage
 }
 
-// // WebSocket连接
-// const connectWebSocket = () => {
-//   ws.value = new WebSocket('ws://localhost:8080/ws/simulation')
-//   ws.value.onopen = () => {
-//     document.getElementById('wsStatus').textContent = '（已连接）'
-//     console.log('WebSocket connected')
-//   }
-//   ws.value.onmessage = (event) => {
-//     const dialogueHistory = document.getElementById('dialogueHistory')
-//     dialogueHistory.innerHTML += `<div class="message">Agent回复: ${event.data}</div>`
-//     dialogueHistory.scrollTop = dialogueHistory.scrollHeight
-//   }
-//   ws.value.onclose = () => {
-//     document.getElementById('wsStatus').textContent = '（连接断开）'
-//     console.log('WebSocket disconnected')
-//   }
-// }
+// WebSocket 测试
+const wsLog = ref('')
+let ws = null
 
-// // 创建模拟
-// const createSimulation = async () => {
-//   try {
-//     const response = await axios.post('/api/simulation', {
-//       name: document.getElementById('simName').value,
-//       description: document.getElementById('simDesc').value,
-//     })
-//     currentSimulationId.value = response.data.id
-//     document.getElementById('simResult').innerHTML = `模拟ID: ${response.data.id}`
-//     connectWebSocket()
-//   } catch (error) {
-//     console.error('创建模拟失败', error)
-//   }
-// }
+// WebSocket 连接
+const connectWebSocket = () => {
+  ws = new WebSocket('ws://localhost:8080/ws/simulation')
 
-// // 创建Agent
-// const createAgent = async () => {
-//   try {
-//     const response = await axios.post('/api/agent', {
-//       agentName: document.getElementById('agentName').value,
-//       roleType: document.getElementById('agentRole').value,
-//     })
-//     document.getElementById('agentResult').innerHTML = `Agent ID: ${response.data.id}`
-//   } catch (error) {
-//     console.error('创建Agent失败', error)
-//   }
-// }
+  ws.onopen = () => {
+    logWsMessage('连接已建立')
+    ws.send(
+      JSON.stringify({
+        type: 'start-dialogue',
+        simulationId: 1,
+        data: { prompt: '测试问题' },
+      }),
+    )
+  }
 
-// // 创建作物
-// const createCrop = async () => {
-//   try {
-//     const response = await axios.post('/api/crop', {
-//       cropName: document.getElementById('cropName').value,
-//       growthRate: parseFloat(document.getElementById('growthRate').value),
-//     })
-//     document.getElementById('cropResult').innerHTML = `作物ID: ${response.data.id}`
-//   } catch (error) {
-//     console.error('创建作物失败', error)
-//   }
-// }
+  ws.onmessage = (event) => {
+    logWsMessage('收到消息: ' + event.data)
+  }
 
-// // 发送对话指令
-// const sendPrompt = () => {
-//   const prompt = document.getElementById('promptInput').value
-//   if (ws.value && ws.value.readyState === WebSocket.OPEN) {
-//     ws.value.send(JSON.stringify({ content: prompt }))
-//     document.getElementById('dialogueHistory').innerHTML +=
-//       `<div class="message">用户指令: ${prompt}</div>`
-//     document.getElementById('promptInput').value = ''
-//   }
-// }
+  ws.onerror = (error) => {
+    logWsMessage('错误: ' + error.message)
+  }
 
-// // 获取环境数据
-// const getLatestEnvironment = async () => {
-//   try {
-//     const response = await axios.get('/api/environment')
-//     document.getElementById('envData').innerHTML = `
-//             温度: ${response.data.temperature.toFixed(1)}℃<br>
-//             土壤肥力: ${(response.data.soilFertility * 100).toFixed(0)}%<br>
-//             降水量: ${response.data.precipitation.toFixed(1)}mm
-//           `
-//   } catch (error) {
-//     console.error('获取环境数据失败', error)
-//   }
-// }
+  ws.onclose = () => {
+    logWsMessage('连接已关闭')
+  }
+}
+
+const logWsMessage = (message) => {
+  wsLog.value += `${new Date().toLocaleTimeString()}: ${message}\n`
+}
+
+
 </script>
+
+<style scoped>
+.generate-button,
+.btn {
+padding:10px 10px;
+background-color: #006400; /* 墨绿色按钮 */
+color: white;
+border: none;
+border-radius: 4px;
+cursor: pointer;
+transition: background-color 0.3s ease;
+
+}
+.generate-button:hover,
+.btn:hover {
+background-color: #004d00; /* 深一点的墨绿色悬停效果 */
+}
+
+</style>
