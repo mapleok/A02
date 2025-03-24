@@ -1,14 +1,11 @@
 package com.example.farmsim.controller;
 
 import com.example.farmsim.model.dto.*;
-import com.example.farmsim.model.entity.AgentDialogue;
-import com.example.farmsim.model.entity.Crop;
-import com.example.farmsim.model.entity.Environment;
-import com.example.farmsim.model.entity.RevenueRecord;
+import com.example.farmsim.model.entity.*;
 import com.example.farmsim.repository.CropRepo;
 import com.example.farmsim.repository.EnvironmentRepo;
 import com.example.farmsim.repository.RevenueRecordRepo;
-
+import com.example.farmsim.repository.SimulationRepo;
 import com.example.farmsim.service.*;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,10 +16,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import com.example.farmsim.service.AgentDialogueService;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 
 @RestController
 @RequestMapping("/api")
@@ -51,183 +48,243 @@ public class ApiController {
     @Autowired
     private CropRepo cropRepo;
 
-    // 创建模拟
-    @PostMapping("/simulation")
-    public ResponseEntity<Map<String, String>> createSimulation(@RequestBody SimulationDTO dto) {
-        String simulationId = simulationService.createSimulation(dto);
-        Map<String, String> response = new HashMap<>();
-        response.put("id", simulationId);
-        response.put("message", "Simulation created successfully");
-        return ResponseEntity.ok(response);
+    @Autowired
+    private SimulationRepo simulationRepo;
+
+    // 会话校验方法
+    private String validateSession(HttpSession session) {
+        String simulationId = (String) session.getAttribute("currentSimulationId");
+        if (simulationId == null) {
+            throw new IllegalArgumentException("当前没有活跃的模拟");
+        }
+        return simulationId;
     }
-    @PostMapping("/simulation/{simulationId}/get-json")
-    public ResponseEntity<?> getJson(@PathVariable String simulationId) {
+
+    @PostMapping("/simulation/{id}/time-scale")
+    public ResponseEntity<?> setTimeScale(
+            @PathVariable String id,
+            @RequestBody Map<String, Integer> request
+    ) {
+        Simulation sim = simulationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("模拟不存在"));
+        sim.setTimeScale(request.get("scale"));
+        simulationRepo.save(sim);
+        return ResponseEntity.ok(Map.of("message", "时间加速设置成功"));
+    }
+
+    @PostMapping("/simulation/{id}/toggle-pause")
+    public ResponseEntity<?> togglePause(@PathVariable String id) {
+        Simulation sim = simulationRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("模拟不存在"));
+        sim.setStatus(
+                sim.getStatus() == SimulationStatus.RUNNING ?
+                        SimulationStatus.PAUSED : SimulationStatus.RUNNING
+        );
+        simulationRepo.save(sim);
+        return ResponseEntity.ok(Map.of(
+                "newStatus", sim.getStatus().name()
+        ));
+    }
+
+    // 创建模拟
+    // 修改后的创建模拟接口
+    @PostMapping("/simulation")
+    public ResponseEntity<Map<String, String>> createSimulation(
+            @RequestBody SimulationDTO dto,
+            HttpSession session // 确保注入 Session
+    ) {
+        String simulationId = simulationService.createSimulation(dto);
+        session.setAttribute("currentSimulationId", simulationId);
+        // 设置 Cookie 有效期（可选）
+        session.setMaxInactiveInterval(36000); // 1小时
+        return ResponseEntity.ok(Map.of("id", simulationId));
+    }
+
+    // 获取当前模拟的JSON指令
+    @PostMapping("/simulation/get-json")
+    public ResponseEntity<?> getJson(HttpSession session) {
         try {
-            // 1. 调用 AgentService 生成 JSON 指令
+            String simulationId = validateSession(session);
             String jsonCommand = agentService.generateJsonCommand(simulationId);
-
-            // 2. 解析 JSON 字符串为 JsonNode（确保格式正确）
-            ObjectMapper mapper = new ObjectMapper();
-            JsonNode jsonNode = mapper.readTree(jsonCommand);
-
-            // 3. 返回 JSON 响应
+            JsonNode jsonNode = new ObjectMapper().readTree(jsonCommand);
             return ResponseEntity.ok(jsonNode);
         } catch (Exception e) {
-            // 4. 错误处理
             return ResponseEntity.status(500).body("错误：" + e.getMessage());
         }
     }
-    // 获取模拟
-    @GetMapping("/simulation/{id}")
-    public ResponseEntity<Map<String, String>> getSimulation(@PathVariable String id) {
-        SimulationDTO simulation = simulationService.getSimulation(id);
-        Map<String, String> response = new HashMap<>();
-        response.put("id", simulation.getId());
-        response.put("name", simulation.getName());
-        response.put("description", simulation.getDescription());
-        return ResponseEntity.ok(response);
+
+    // 获取模拟信息
+    @GetMapping("/simulation")
+    public ResponseEntity<Map<String, String>> getSimulation(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            SimulationDTO simulation = simulationService.getSimulation(simulationId);
+            Map<String, String> response = new HashMap<>();
+            response.put("id", simulation.getId());
+            response.put("name", simulation.getName());
+            response.put("description", simulation.getDescription());
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @PostMapping("/simulation/{simulationId}/end")
-    public ResponseEntity<String> endSimulation(@PathVariable String simulationId) {
+    // 结束当前模拟
+    @PostMapping("/simulation/end")
+    public ResponseEntity<String> endSimulation(HttpSession session) {
         try {
+            String simulationId = validateSession(session);
             simulationService.endSimulation(simulationId);
+            session.removeAttribute("currentSimulationId"); // 清除会话中的ID
             return ResponseEntity.ok("模拟已结束，收成数据已计算并保存。");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("结束模拟失败: " + e.getMessage());
         }
     }
 
-    // 创建 Agent
+    // 创建Agent（自动关联当前模拟）
     @PostMapping("/agent")
-    public ResponseEntity<Map<String, String>> createAgent(@RequestBody AgentDTO dto) {
+    public ResponseEntity<?> createAgent(@RequestBody AgentDTO dto, HttpSession session) {
         try {
-            // 1. 验证输入参数
-            if (StringUtils.isEmpty(dto.getAgentName())) {
-                throw new IllegalArgumentException("Agent 名称不能为空");
-            }
-            if (StringUtils.isEmpty(dto.getSimulationId())) {
-                throw new IllegalArgumentException("模拟 ID 不能为空");
-            }
-
-            // 2. 调用服务层创建 Agent
-            agentService.createAgent(dto.getAgentName(), dto.getSimulationId());
-
-            // 3. 返回成功响应
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Agent 创建成功");
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            // 4. 处理参数错误
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", e.getMessage());
-            return ResponseEntity.badRequest().body(errorResponse);
+            String simulationId = validateSession(session);
+            agentService.createAgent(dto.getAgentName(), simulationId);
+            return ResponseEntity.ok(Map.of("message", "Agent创建成功"));
         } catch (Exception e) {
-            // 5. 处理其他异常
-            Map<String, String> errorResponse = new HashMap<>();
-            errorResponse.put("error", "创建 Agent 失败: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
-    @PostMapping("/simulation/{simulationId}/start-dialogue")
-    public String startDialogue(
-            @PathVariable String simulationId,
-            @RequestBody Map<String, String> request) {
-        // 调用修改后的无JSON版本
-        return agentService.startDialogue(simulationId, request.get("prompt"));
-    }
-
-    // EnvironmentController.java
-    @PostMapping("/random-weather/{simulationId}")
-    public ResponseEntity<String> randomizeWeather(@PathVariable String simulationId) {
-        Environment latestEnv = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
-
-        // 实现随机变化逻辑（示例）
-        latestEnv.setTemperature(latestEnv.getTemperature() + (Math.random() * 4 - 2));
-        latestEnv.setPrecipitation(latestEnv.getPrecipitation() + (Math.random() * 20 - 10));
-        latestEnv.setSoilFertility(latestEnv.getSoilFertility() + (Math.random() * 0.1 - 0.05));
-
-        // 约束取值范围
-        latestEnv.setTemperature(Math.max(-50, Math.min(50, latestEnv.getTemperature())));
-        latestEnv.setPrecipitation(Math.max(0, latestEnv.getPrecipitation()));
-        latestEnv.setSoilFertility(Math.max(0, Math.min(1, latestEnv.getSoilFertility())));
-
-        environmentRepo.save(latestEnv);
-        return ResponseEntity.ok("天气已随机更新");
-    }
-
-    @PostMapping("/agent/decision")
-    public ResponseEntity<?> makeAgentDecision(
-            @RequestParam String agentId,
-            @RequestParam String prompt
-    ) {
+    // 启动对话（自动关联当前模拟）
+    @PostMapping("/start-dialogue")
+    public ResponseEntity<?> startDialogue(@RequestBody Map<String, String> request, HttpSession session) {
         try {
-            String response = agentService.makeDecision(agentId, prompt);
+            String simulationId = validateSession(session);
+            String response = agentService.startDialogue(simulationId, request.get("prompt"));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("错误：" + e.getMessage());
         }
     }
 
-    // 创建农作物
+    // 随机天气（自动关联当前模拟）
+    @PostMapping("/random-weather")
+    public ResponseEntity<String> randomizeWeather(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            Environment latestEnv = environmentRepo.findTopBySimulationIdOrderByTimestampDesc(simulationId);
+
+            latestEnv.setTemperature(Math.max(-50, Math.min(50, latestEnv.getTemperature() + (Math.random() * 4 - 2))));
+            latestEnv.setPrecipitation(Math.max(0, latestEnv.getPrecipitation() + (Math.random() * 20 - 10)));
+            latestEnv.setSoilFertility(Math.max(0, Math.min(1, latestEnv.getSoilFertility() + (Math.random() * 0.1 - 0.05))));
+
+            environmentRepo.save(latestEnv);
+            return ResponseEntity.ok("天气已随机更新");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("操作失败: " + e.getMessage());
+        }
+    }
+
+    // 创建农作物（自动关联当前模拟）
     @PostMapping("/crop")
-    public ResponseEntity<Map<String, String>> createCrop(@RequestBody CropDTO dto) {
-        String cropId = cropService.createCrop(dto);
-        Map<String, String> response = new HashMap<>();
-        response.put("id", cropId);
-        response.put("message", "Crop created successfully");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> createCrop(@RequestBody CropDTO dto, HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            dto.setSimulationId(simulationId);
+            String cropId = cropService.createCrop(dto);
+            return ResponseEntity.ok(Map.of("id", cropId, "message", "作物创建成功"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-    @GetMapping("/simulation/{simulationId}/revenue-comparison")
-    public ResponseEntity<Map<String, Double>> getRevenueComparison(@PathVariable String simulationId) {
-        List<RevenueRecord> records = revenueRecordRepo.findBySimulationId(simulationId);
+    // 获取收益对比（自动关联当前模拟）
+    @GetMapping("/revenue-comparison")
+    public ResponseEntity<?> getRevenueComparison(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            List<RevenueRecord> records = revenueRecordRepo.findBySimulationId(simulationId);
 
-        double beforeExpert = records.stream()
-                .filter(r -> !r.isExpertModeEnabled())
-                .mapToDouble(RevenueRecord::getRevenue)
-                .average().orElse(0);
+            double beforeExpert = records.stream()
+                    .filter(r -> !r.isExpertModeEnabled())
+                    .mapToDouble(RevenueRecord::getRevenue)
+                    .average().orElse(0);
 
-        double afterExpert = records.stream()
-                .filter(r -> r.isExpertModeEnabled())
-                .mapToDouble(RevenueRecord::getRevenue)
-                .average().orElse(0);
+            double afterExpert = records.stream()
+                    .filter(r -> r.isExpertModeEnabled())
+                    .mapToDouble(RevenueRecord::getRevenue)
+                    .average().orElse(0);
 
-        Map<String, Double> result = new HashMap<>();
-        result.put("beforeExpert", beforeExpert);
-        result.put("afterExpert", afterExpert);
-        return ResponseEntity.ok(result);
+            Map<String, Double> result = new HashMap<>();
+            result.put("beforeExpert", beforeExpert);
+            result.put("afterExpert", afterExpert);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
-
-    @PostMapping("/simulation/{simulationId}/enable-expert-mode")
-    public ResponseEntity<String> enableExpertMode(@PathVariable String simulationId) {
-        agentService.createAgronomist(simulationId);
-        agentService.triggerAgentDialogue(simulationId); // 新增：触发对话
-        return ResponseEntity.ok("农业专家模式已开启，对话已触发");
+    // 启用专家模式（自动关联当前模拟）
+    @PostMapping("/enable-expert-mode")
+    public ResponseEntity<String> enableExpertMode(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            agentService.createAgronomist(simulationId);
+            agentService.triggerAgentDialogue(simulationId);
+            return ResponseEntity.ok("农业专家模式已开启，对话已触发");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("操作失败: " + e.getMessage());
+        }
     }
 
-
+    // 创建环境（自动关联当前模拟）
     @PostMapping("/environment")
-    public ResponseEntity<Map<String, String>> createEnvironment(@RequestBody EnvironmentDTO dto) {
-        Long environmentId = environmentService.createEnvironment(dto);
-        Map<String, String> response = new HashMap<>();
-        response.put("id", environmentId.toString());
-        response.put("message", "Environment created successfully");
-        return ResponseEntity.ok(response);
+    public ResponseEntity<?> createEnvironment(@RequestBody EnvironmentDTO dto, HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            dto.setSimulationId(simulationId);
+            Long environmentId = environmentService.createEnvironment(dto);
+            return ResponseEntity.ok(Map.of("id", environmentId.toString(), "message", "环境创建成功"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
+    // 设置时间速率（自动关联当前模拟）
+    @PostMapping("/set-time-scale")
+    public ResponseEntity<String> setTimeScale(@RequestParam int timeScale, HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            Simulation sim = simulationRepo.findById(simulationId)
+                    .orElseThrow(() -> new RuntimeException("模拟不存在"));
+            sim.setTimeScale(timeScale);
+            simulationRepo.save(sim);
+            return ResponseEntity.ok("时间速率已设置为 1 分钟 = " + timeScale + " 天");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("操作失败: " + e.getMessage());
+        }
+    }
+
+    // 获取作物列表（自动关联当前模拟）
     @GetMapping("/crops")
-    public ResponseEntity<List<Crop>> getCropsBySimulationId(@RequestParam String simulationId) {
-        List<Crop> crops = cropRepo.findBySimulationId(simulationId);
-        return ResponseEntity.ok(crops);
+    public ResponseEntity<?> getCrops(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            List<Crop> crops = cropRepo.findBySimulationId(simulationId);
+            return ResponseEntity.ok(crops);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("获取失败: " + e.getMessage());
+        }
     }
 
-
-    @GetMapping("/simulation/{id}/dialogue-history")
-    public ResponseEntity<List<AgentDialogue>> getDialogueHistory(@PathVariable String id) {
-        List<AgentDialogue> history = agentDialogueService.getDialogueHistory(id);
-        return ResponseEntity.ok(history);
+    // 获取对话历史（自动关联当前模拟）
+    @GetMapping("/dialogue-history")
+    public ResponseEntity<?> getDialogueHistory(HttpSession session) {
+        try {
+            String simulationId = validateSession(session);
+            List<AgentDialogue> history = agentDialogueService.getDialogueHistory(simulationId);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("获取失败: " + e.getMessage());
+        }
     }
 }

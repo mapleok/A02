@@ -18,6 +18,12 @@ public class AgentCommand {
     private String parameters; // 存储JSON字符串
     private LocalDateTime timestamp;
 
+    @Enumerated(EnumType.STRING)
+    private CommandStatus status = CommandStatus.PENDING; // 执行状态
+
+    private LocalDateTime executedTime; // 执行时间戳
+
+
     @ManyToOne
     @JoinColumn(name = "simulation_id")
     private Simulation simulation;

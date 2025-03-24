@@ -43,5 +43,47 @@ public class EnvironmentService {
         environmentRepo.save(env);
         return env.getId();
     }
+
+    public Long createCustomEnvironment(EnvironmentDTO dto) {
+        // 数据验证
+        if (dto.getTemperature() < -50 || dto.getTemperature() > 50) {
+            throw new IllegalArgumentException("温度应在 -50℃ 到 50℃ 之间");
+        }
+        if (dto.getSoilFertility() < 0 || dto.getSoilFertility() > 100) {
+            throw new IllegalArgumentException("土壤肥力应在 0% 到 100% 之间");
+        }
+        if (dto.getPrecipitation() < 0) {
+            throw new IllegalArgumentException("降水量不能为负数");
+        }
+        if (dto.getTerrain() == null || dto.getTerrain().isEmpty()) {
+            throw new IllegalArgumentException("地形不能为空");
+        }
+        if (dto.getClimate() == null || dto.getClimate().isEmpty()) {
+            throw new IllegalArgumentException("气候不能为空");
+        }
+        if (dto.getAgriculturalTechnology() == null || dto.getAgriculturalTechnology().isEmpty()) {
+            throw new IllegalArgumentException("农业技术不能为空");
+        }
+
+        // 创建环境对象
+        Environment env = new Environment();
+        env.setTemperature(dto.getTemperature());
+        env.setSoilFertility(dto.getSoilFertility() / 100.0); // 将百分比转换为小数
+        env.setPrecipitation(dto.getPrecipitation());
+        env.setTerrain(dto.getTerrain());
+        env.setClimate(dto.getClimate());
+        env.setAgriculturalTechnology(dto.getAgriculturalTechnology());
+        env.setTimestamp(LocalDateTime.now());
+        env.setCustomEnvironment(true); // 标记为用户自定义环境
+
+        // 查找关联的模拟
+        Simulation simulation = simulationRepo.findById(dto.getSimulationId())
+                .orElseThrow(() -> new RuntimeException("模拟不存在: " + dto.getSimulationId()));
+        env.setSimulation(simulation);
+
+        // 保存数据
+        environmentRepo.save(env);
+        return env.getId();
+    }
 }
 

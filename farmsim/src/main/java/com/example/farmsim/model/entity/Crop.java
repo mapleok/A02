@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,6 +17,12 @@ public class Crop {
     private double tempWeight = 0.5;
     private double soilWeight = 0.5;
     private double waterWeight = 0.5;
+
+    private int maturityTime;
+    private LocalDate plantingDate;
+    private boolean isMature;
+    private double growthProgress;
+
 
     @ManyToOne
     @JoinColumn(name = "simulation_id")

@@ -49,6 +49,9 @@
 
   /* 节间距 */
   --section-gap: 160px;
+
+  --color-primary: #000000;
+  --color-secondary: #3bc2b2;
 }
 
 /* 当系统偏好深色模式时的颜色变量设置 */
@@ -80,16 +83,26 @@
   padding: 0;
 }
 
-/* 页面主体样式，设置字体、行高、文本颜色、背景颜色以及颜色和背景色变化的过渡效果 */
-body {
-  font-family: "SF Pro Text", "SF Pro Icons", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
-  line-height: 1.6;
-  color: var(--color-text);
-  background-color: var(--color-background);
-  transition: color 0.3s ease, background-color 0.3s ease;
+/* 页面主体样式 */
+.page-container {
+  font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+  padding: 20px;
+  background-color: #fff;
+  display: flex;
+  flex-direction: column;
+
 }
 
 /* 链接样式，设置默认文本颜色和鼠标悬停时的颜色变化过渡效果 */
+a {
+  color: var(--color-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--color-primary);
+}
 
 /* 标题样式，设置标题文本颜色和底部外边距 */
 h1, h2, h3, h4, h5, h6 {
@@ -103,10 +116,46 @@ ul, ol {
   list-style: none;
 }
 
-/* 侧边栏整体样式，设置背景色、阴影和顶部内边距 */
+/* 侧边栏容器样式，设置相对定位和弹性布局 */
+.sidebar-container {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+}
+
+/* 侧边栏显示/隐藏按钮样式，设置绝对定位、背景色、文本颜色、边框、圆角、内边距、光标样式和过渡效果 */
+.toggle-button {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 10;
+  transition: left 0.3s ease;
+}
+
+/* 当侧边栏隐藏时按钮的样式，调整按钮位置 */
+.sidebar-container.hidden .toggle-button {
+  left: 10px;
+}
+
+/* 侧边栏整体样式，设置宽度、高度、背景色（半透明）、过渡效果、阴影和边框（去除） */
 .sidebar {
-  background-color: var(--color-background-soft);
-  box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
+  min-width: 240px;
+  height: 100vh;
+  background-color: rgba(244, 247, 249, 0.8); /* 半透明背景 */
+  transition: transform 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* 阴影效果，增加高级感 */
+  border: 1px; /* 去掉框线 */
+}
+
+/* 隐藏状态下的侧边栏样式，通过平移实现隐藏效果 */
+.sidebar.hidden {
+  transform: translateX(-100%);
 }
 
 /* 侧边栏菜单样式，去除右侧边框 */
@@ -123,13 +172,35 @@ ul, ol {
   transition: color 0.3s ease;
 }
 
+/* 侧边栏图标和文本样式 */
+.sidebar-icon-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text);
+  font-size: 16px;
+}
+
+/* 侧边栏导航链接样式 */
+.sidebar-nav-link {
+  color: var(--color-text);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: 0 10px 0 10px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 侧边栏导航链接鼠标悬停样式 */
+.sidebar-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0);
+}
 
 /* 侧边栏激活链接样式，设置文本颜色和加粗效果 */
 .sidebar.sidebar-nav-link.router-link-active {
-  color: #0071e3!important;
+  color: var(--color-primary)!important;
   font-weight: 600!important;
 }
-
 
 /* 侧边栏子菜单箭头样式，设置箭头颜色 */
 .sidebar.el-sub-menu__icon-arrow {
@@ -148,15 +219,19 @@ ul, ol {
   cursor: pointer;
 }
 
-/* 按钮鼠标悬停样式，设置背景色和边框颜色变化 */
-.el-button:hover {
-  background-color: #e0e0e0;
-  border-color: #999;
+
+/* 修改 ElementPlus 图标（el-icon）的样式 */
+.el-icon {
+  font-size: 20px;
+  color: var(--color-primary);
+  transition: color 0.3s ease;
 }
 
-:root {
-  --color-primary: #0071e3;
-  --color-secondary: #3bc2b2;
-  --color-text: #000000;
-  --color-background: #fafafa;
+/* 鼠标悬停在 ElementPlus 图标上时的样式设置 */
+.el-icon:hover {
+  color: #65ff00;
+
 }
+
+/* 引入 Font Awesome 图标库 */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css');

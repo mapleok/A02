@@ -33,6 +33,10 @@ public class CropService {
         crop.setSoilWeight(dto.getSoilWeight());
         crop.setWaterWeight(dto.getWaterWeight());
 
+        double environmentFactor = 1 + (dto.getTempWeight() + dto.getSoilWeight() + dto.getWaterWeight()) / 3;
+        int maturityTime = (int) (100 / (dto.getGrowthRate() * environmentFactor)); // 基础成熟时间为 100 天
+        crop.setMaturityTime(maturityTime);
+
         // 关联模拟
         Simulation simulation = simulationRepo.findById(dto.getSimulationId())
                 .orElseThrow(() -> new RuntimeException("模拟ID " + dto.getSimulationId() + " 不存在"));

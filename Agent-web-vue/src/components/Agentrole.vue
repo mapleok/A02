@@ -1,8 +1,7 @@
 <template>
-
-    <!-- 整体容器，使用 flex 布局实现横行布局 -->
-    
-      <div class="left-column">
+  <div class="multi-agent-farm-simulation">
+    <div class="row-layout">
+      <div class="page-container">
         <div class="agent-cards">
           <!-- Agent 1 -->
           <div class="agent-card">
@@ -50,127 +49,121 @@
               </el-select>
             </div>
           </div>
-
-
-
-          <!-- 随机生成 Agent 角色 1 -->
           <div class="agent-card random-agent-generation">
-            <h3>随机生成 Agent 角色 1</h3>
-            <div class="input-group">
-              <button @click="generateRandomAgent1" class="generate-button">
-                生成随机 Agent 1
-              </button>
-            </div>
-            <div v-if="randomAgent1" class="input-group inline-input-group">
-              <h4>{{ randomAgent1.name }}</h4>
-              <p>角色设定：{{ randomAgent1.role }}</p>
-              <p>数量：{{ randomAgent1.count }}</p>
+            <div class="agent-card">
+              <h3>Agent 3</h3>
+              <div class="input-group inline-input-group">
+                <label for="agent3-name">名称</label>
+                <el-input v-model="agent3Name" />
+              </div>
+              <div class="input-group inline-input-group">
+                <label for="agent3-role">角色</label>
+                <el-input v-model="agent3Role" />
+              </div>
+              <div class="input-group inline-input-group">
+                <label for="agent3-count">数量</label>
+                <el-select v-model="agent3Count">
+                  <el-option
+                    v-for="count in agentCountOptions"
+                    :key="count"
+                    :label="count"
+                    :value="count"
+                  />
+                </el-select>
+              </div>
             </div>
           </div>
-          <div class="agent-card random-agent-generation">
-            <h3>随机生成 Agent 角色 2</h3>
-            <div class="input-group">
-              <button @click="generateRandomAgent2" class="generate-button">
-                生成随机 Agent 2
-              </button>
+          <div class="row-layout">
+            <!-- 随机生成 Agent 角色 1 -->
+            <div class="agent-card random-agent-generation">
+              <h3>随机生成 Agent 角色 1</h3>
+              <div class="input-group">
+                <button @click="generateRandomAgent1" class="generate-button">
+                  生成随机 Agent 1
+                </button>
+              </div>
+              <div v-if="randomAgent1" class="input-group inline-input-group">
+                <h4>{{ randomAgent1.name }}</h4>
+                <p>角色设定：{{ randomAgent1.role }}</p>
+                <p>数量：{{ randomAgent1.count }}</p>
+              </div>
             </div>
-            <div v-if="randomAgent2" class="input-group inline-input-group">
-              <h4>{{ randomAgent2.name }}</h4>
-              <p>角色设定：{{ randomAgent2.role }}</p>
-              <p>数量：{{ randomAgent2.count }}</p>
+            <div class="agent-card random-agent-generation">
+              <h3>随机生成 Agent 角色 2</h3>
+              <div class="input-group">
+                <button @click="generateRandomAgent2" class="generate-button">
+                  生成随机 Agent 2
+                </button>
+              </div>
+              <div v-if="randomAgent2" class="input-group inline-input-group">
+                <h4>{{ randomAgent2.name }}</h4>
+                <p>角色设定：{{ randomAgent2.role }}</p>
+                <p>数量：{{ randomAgent2.count }}</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="right-column">
-      <!-- 右侧区域 -->
-      <div class="right-section">
-        <!-- 农业智能体和作物管理 -->
-        <div class="agent-card random-agent-generation">
-          <div class="agent-card">
-            <h3>Agent 3 </h3>
-            <div class="input-group inline-input-group">
-              <label for="agent3-name">名称</label>
-              <el-input v-model="agent3Name"/>
-            </div>
-            <div class="input-group inline-input-group">
-              <label for="agent3-role">角色</label>
-              <el-input v-model="agent3Role"/>
-            </div>
-            <div class="input-group inline-input-group">
-              <label for="agent3-count">数量</label>
-              <el-select v-model="agent3Count">
-                <el-option
-                  v-for="count in agentCountOptions"
-                  :key="count"
-                  :label="count"
-                  :value="count"
-                />
-              </el-select>
-            </div>
-          </div>
-        </div>
-
-        <!-- 统一创建智能体按钮 -->
-        <div class="create-agent-btn-container">
-          <button @click="createAgent" class="generate-button">创建</button>
-          <pre>{{ agentResult }}</pre>
-        </div>
+      <!-- 统一创建智能体按钮 -->
+      <div class="create-agent-btn-container">
+        <button @click="handleCreateAgent" class="generate-button">创建</button>
+        <pre>{{ agentResult }}</pre>
       </div>
-
-      <div class="agent-card random-agent-generation">
-        <h3>启动对话</h3>
-        <div class="agent-card">
-          <div class="input-group inline-input-group">
+    </div>
+    <div class="agent-card random-agent-generation">
+      <h3>启动对话</h3>
+      <div class="agent-card">
+        <div class="input-group inline-input-group">
           <label for="dialoguePrompt">对话提示</label>
-          <input type="text" id="dialoguePrompt" placeholder="输入对话提示">
-          <button onclick="startDialogue()" class="generate-button">启动对话</button>
-
-    <button @click="showAgentConversation" class="generate-button">查看 Agent 对话记录</button>
-          </div>
-    <div v-if="showConversation" class="input-container">
-      <div class="input-group">
-        <div class="input-item">
-          <h3 class="subsection-title">查询条件</h3>
-          <el-input
-            v-model="query"
-            clearable
-            placeholder="输入查询条件"
-            class="el-input-field"
-          />
+          <input type="text" id="dialoguePrompt" placeholder="输入对话提示" />
+          <button @click="handleStartDialogue()" class="generate-button">启动对话</button>
+          <button @click="handleGetDialogueHistory" class="generate-button">
+            查看 Agent 对话记录
+          </button>
         </div>
-        <div class="input-item">
-          <el-button @click="fetchAgentConversation" class="action-button">查询</el-button>
-        </div>
-      </div>
-      <div class="input-group">
-        <div class="input-item">
-          <h3 class="subsection-title">Agent 对话记录</h3>
-          <div class="agent-card">
-            <div class="input-group inline-input-group">
-              <input type="text" id="simulationIdForHistory" placeholder="输入场景名称">
-              <button onclick="getDialogueHistory()" class="generate-button">获取历史</button>
+        <div v-if="showConversation" class="input-container">
+          <div class="input-group">
+            <div class="input-item">
+              <h3 class="subsection-title">!查询条件</h3>
+              <el-input
+                v-model="query"
+                clearable
+                placeholder="输入查询条件"
+                class="el-input-field"
+              />
+            </div>
+            <div class="input-item">
+              <el-button @click="fetchAgentConversation" class="action-button">!查询</el-button>
             </div>
           </div>
-          <el-input
-            type="textarea"
-            v-model="conversationContent"
-            :rows="10"
-            readonly
-            placeholder="这里将显示 agent 互相对话的内容"
-            class="el-input-field"
-          />
+          <div class="input-group">
+            <div class="input-item">
+              <h3 class="subsection-title">!Agent 对话记录</h3>
+              <div class="agent-card">
+                <div class="input-group inline-input-group">
+                  <input type="text" id="simulationIdForHistory" placeholder="输入场景名称" />
+                  <button @click="handleGetDialogueHistory()" class="generate-button">!获取历史</button>
+                </div>
+              </div>
+              <el-input
+                type="textarea"
+                v-model="conversationContent"
+                :rows="10"
+                readonly
+                placeholder="这里将显示 agent 互相对话的内容"
+                class="el-input-field"
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
-      </div>
-
 </template>
 
-<script setup>
-import { ref } from 'vue'
+<script setup>import { ref } from 'vue'
 
 // Agent 1 相关数据
 const agent1Name = ref('')
@@ -187,52 +180,86 @@ const agent3Count = ref('')
 // 可选择的 Agent 数量选项
 const agentCountOptions = [1, 2, 3, 4, 5]
 
-// 创建Agent
-// 添加 simulationId 的响应式变量
-const simulationId = ref('');
+const showConversation = ref(false)
+const query = ref('')
+const conversationContent = ref('')
 
-const showConversation = ref(false);
-const query = ref('');
-const conversationContent = ref('');
-async function createAgent() {
-  const result = await callApi('/agent', 'POST', {
-    agentName: agent1Name.value,
-    simulationId: simulationId.value, // 使用响应式变量
-    roleType: agent1Role.value,
-  })
-  agentResult.value = JSON.stringify(result, null, 2)
-}
+import {
+  createAgent,
+  startDialogue,
+  getDialogueHistory,
 
+} from '../api/index';
 
-// 启动对话
-async function startDialogue() {
-  const simulationId = document.getElementById("simulationIdForDialogue").value;
-  const prompt = document.getElementById("dialoguePrompt").value;
-  const response = await fetch(`${baseUrl}/simulation/${simulationId}/start-dialogue`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ prompt })
-  });
-  const data = await response.json();
-  document.getElementById("startDialogueResponse").innerText = JSON.stringify(data, null, 2);
-}
+const error = ref(null);
+const loading = ref(false);
 
-// 获取对话历史
-async function getDialogueHistory() {
-  const simulationId = document.getElementById("simulationIdForHistory").value;
-  const response = await fetch(`${baseUrl}/simulation/${simulationId}/dialogue-history`);
-  const data = await response.json();
-  document.getElementById("dialogueHistoryResponse").innerText = JSON.stringify(data, null, 2);
-}
-
-
-const showAgentConversation = () => {
-  showConversation.value = !showConversation.value;
+const handleCreateAgent = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const dto = {
+      agents: [
+        {
+          name: agent1Name.value,
+          role: agent1Role.value,
+          count: agent1Count.value
+        },
+        {
+          name: agent2Role.value, // 原代码中 agent2 输入框绑定错误，这里假设修正
+          role: agent2Role.value,
+          count: agent2Count.value
+        },
+        {
+          name: agent3Name.value,
+          role: agent3Role.value,
+          count: agent3Count.value
+        }
+      ]
+    };
+    const response = await createAgent(dto);
+    console.log('Agent创建成功:', response.data);
+  } catch (error) {
+    error.value = '创建Agent失败: ' + error.message;
+  } finally {
+    loading.value = false;
+  }
 };
 
-const fetchAgentConversation = () => {
-  // 查询 Agent 对话记录的逻辑
+const handleStartDialogue = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const prompt = '示例提示';
+    const response = await startDialogue(prompt);
+    console.log('对话启动:', response.data);
+  } catch (error) {
+    error.value = '启动对话失败: ' + error.message;
+  } finally {
+    loading.value = false;
+  }
 };
+
+const handleGetDialogueHistory = async () => {
+  loading.value = true;
+  error.value = null;
+  try {
+    const response = await getDialogueHistory();
+    console.log('对话历史:', response.data);
+  } catch (error) {
+    error.value = '获取对话历史失败: ' + error.message;
+  } finally {
+    loading.value = false;
+  }
+};
+
+// const showAgentConversation = () => {
+//   showConversation.value = !showConversation.value
+// }
+
+// const fetchAgentConversation = () => {
+//   // 查询 Agent 对话记录的逻辑
+// }
 
 const agentResult = ref('')
 
@@ -279,29 +306,21 @@ const generateRandomAgent2 = () => {
     count: randomCount,
   }
 }
-
 </script>
 
 <style scoped>
-/* 移除与全局样式冲突的按钮样式等 */
-/* 保留组件特定的样式 */
 .multi-agent-farm-simulation {
   padding: 20px;
   background-color: #fff;
   color: #333;
   font-family: 'SF Pro Text', 'SF Pro Icons', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
-}
-.h3{
-  text-align: left;
-}
-.row-layout {
-  display: flex; /* 使用 flex 布局 */
-  gap: 20px; /* 两栏之间的间距 */
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-.left-column,
-.right-column {
-  flex: 1;
+.row-layout {
+  display: flex;
+  gap: 20px;
 }
 
 .agent-cards {
@@ -311,8 +330,8 @@ const generateRandomAgent2 = () => {
 }
 
 .agent-card {
-  background-color: #f9f9f9; /* 浅灰色背景 */
-  border: none; /* 移除边框 */
+  background-color: #f9f9f9;
+  border: none;
   border-radius: 8px;
   padding: 5px 10px;
   flex: 1 1 calc(50% - 20px);
@@ -323,117 +342,29 @@ const generateRandomAgent2 = () => {
 }
 
 .inline-input-group {
-  display: flex; /* 使用 flex 布局让子元素在一行显示 */
-  align-items: center; /* 垂直居中对齐 */
-  gap: 10px; /* 元素之间的间距 */
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .inline-input-group label {
-  margin-bottom: 0; /* 移除 label 的底部外边距 */
-  white-space: nowrap; /* 防止 label 文字换行 */
+  margin-bottom: 0;
+  white-space: nowrap;
 }
 
 .inline-input-group .el-input,
 .inline-input-group .el-select {
-  flex: 1; /* 让输入框占据剩余空间 */
+  flex: 1;
 }
 
 .random-agent-generation {
-  margin-top: 20px;
+
   text-align: center;
 }
 
 .generate-button {
   padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.task-selection,
-.technology-selection {
-  margin-top: 20px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 5px;
-}
-
-.form-control {
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 3px;
-}
-
-.btn-outline-success {
-  border: 1px solid #28a745;
-  color: #28a745;
-  background-color: transparent;
-}
-.generate-button:hover,
-.btn:hover {
-  background-color: #004d00; /* 深一点的墨绿色悬停效果 */
-}
-
-.btn-outline-success {
-  border: 1px solid #006400;
-  color: #006400;
-  background-color: transparent;
-}
-
-.btn-outline-success:hover {
   background-color: #006400;
-  color: white;
-}
-
-.btn-sm {
-  font-size: 0.8rem;
-}
-
-.btn-success {
-  background-color: #28a745;
-  color: white;
-}
-
-.btn-primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn-warning {
-  background-color: #ffc107;
-  color: white;
-}
-
-.btn-info {
-  background-color: #17a2b8;
-  color: white;
-}
-
-.text-muted {
-  font-size: 0.8rem;
-  color: #6c757d;
-}
-
-.dashboard-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 20px;
-}
-
-.btn-group {
-  margin-bottom: 10px;
-}
-.generate-button,
-.btn {
-  padding: 10px 20px;
-  background-color: #006400; /* 墨绿色按钮 */
   color: white;
   border: none;
   border-radius: 4px;
@@ -441,7 +372,22 @@ const generateRandomAgent2 = () => {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background: #45a049;
+.generate-button:hover {
+  background-color: #004d00;
+}
+
+.input-container {
+  margin-top: 20px;
+}
+
+.el-input-field {
+  margin-bottom: 10px;
+}
+
+.subsection-title {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 10px;
+  font-weight: 600;
 }
 </style>

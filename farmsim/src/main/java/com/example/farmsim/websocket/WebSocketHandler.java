@@ -46,6 +46,15 @@ public class WebSocketHandler extends TextWebSocketHandler {
                 case "auto-dialogue": // 新增：处理自动对话消息
                     handleAutoDialogue(session, msg);
                     break;
+                case "animation-ack":
+                    handleAnimationAck(session, msg);
+                    break;
+                case "agent-created":
+                    // Unity 需要执行的逻辑（如生成 Agent 模型）
+                    break;
+                case "crop-created":
+                    // Unity 需要执行的逻辑（如种植动画）
+                    break;
                 default:
                     session.sendMessage(new TextMessage("{\"type\":\"error\", \"content\":\"未知消息类型: " + type + "\"}"));
                     break;
@@ -53,6 +62,11 @@ public class WebSocketHandler extends TextWebSocketHandler {
         } catch (Exception e) {
             session.sendMessage(new TextMessage("{\"type\":\"error\", \"content\":\"服务器错误: " + e.getMessage() + "\"}"));
         }
+    }
+
+    private void handleAnimationAck(WebSocketSession session, Message msg) {
+        String commandId = (String) msg.getData().get("commandId");
+        System.out.println("Unity确认执行指令:" + commandId);
     }
 
     private void handleStartDialogue(WebSocketSession session, Message msg) throws IOException {

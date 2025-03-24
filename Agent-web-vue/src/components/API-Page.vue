@@ -1,5 +1,6 @@
 <template>
   <div class="agent-simulation-container">
+    <div class="page-container">
     <h3>Agent 合作系统模拟 - 后端 API 调用数据显示</h3>
     <!-- 搜索框，用于筛选 API 调用记录 -->
     <el-input
@@ -33,6 +34,7 @@
     <h2>WebSocket 测试</h2>
     <button @click="connectWebSocket" class="generate-button">连接 WebSocket</button>
     <div id="wsLog">{{ wsLog }}</div>
+  </div>
   </div>
 </template>
 

@@ -12,10 +12,15 @@ import java.util.Map;
 @Setter
 public class Agent {
     @Id
+    @Column(name = "agent_id")
     private String agentId;
+    @Column(name = "agent_name")
     private String agentName;
+    @Column(name = "role_type")
     private String roleType;
+    @Column(name = "current_action")
     private String currentAction;
+    @Column(name = "name")
     private String name;
 
     @ElementCollection
@@ -23,9 +28,11 @@ public class Agent {
     @MapKeyColumn(name = "property_key")
     @Column(name = "property_value")
     private Map<String, String> properties;
-
-    private double plantingSkill;
+    @Column(nullable = false)
     private double learningAbility;
+    @Column(nullable = false)
+    private double plantingSkill;
+    @Column(nullable = false)
     private double localKnowledge;
 
     @ElementCollection

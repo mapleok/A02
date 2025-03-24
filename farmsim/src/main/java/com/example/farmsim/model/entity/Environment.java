@@ -22,7 +22,8 @@ public class Environment {
     private String terrain;          // 地形（如平原、山地、丘陵等）
     private String climate;          // 气候（如温带季风气候、热带雨林气候等）
     private String agriculturalTechnology; // 农业技术（如传统农业、精准农业等）
-    private LocalDateTime timestamp; // 时间戳
+    private LocalDateTime timestamp;
+    private boolean isCustomEnvironment;// 时间戳
 
     @ManyToOne
     @JoinColumn(name = "simulation_id")

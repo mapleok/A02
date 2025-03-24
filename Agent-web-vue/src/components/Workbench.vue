@@ -1,5 +1,5 @@
 <template>
-  <div class="main-container">
+  <div class="page-container">
     <div class="nav-container">
       <ul class="nav-links">
         <h3 class="page-title">Unity 实时画面与信息查看</h3>
@@ -46,31 +46,17 @@ import 'element-plus/dist/index.css';
   margin: 10px 20px;
 }
 
-.main-container {
-  display: flex;
-  gap: 20px;
-  margin-left: 0;
-  border-radius: 4px
-}
 
 .nav-container {
   margin-top: 0px;
-  background-color: #fff;
   border-radius: 12px;
   padding: 5px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   width: 100%;
   gap: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-}
 
-.nav-title {
-  font-size: 20px;
-  color: #426571d0;
-  font-weight: bold;
-  margin-right: 20px;
 }
 
 .nav-links {
@@ -94,11 +80,6 @@ import 'element-plus/dist/index.css';
   background-color: #e0e0e0;
 }
 
-/*  Unity 画面容器样式 */
-.right-section {
-  flex: 2;
-  min-width: 0;
-}
 
 /* Unity 画面 iframe 样式 */
 .unity-iframe {

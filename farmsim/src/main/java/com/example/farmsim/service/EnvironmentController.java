@@ -35,33 +35,11 @@ public class EnvironmentController {
         return ResponseEntity.ok(dto);
     }
 
-    // EnvironmentController.java
-    // EnvironmentController.java
+
     @PostMapping("/custom")
     public ResponseEntity<Long> createCustomEnvironment(@RequestBody EnvironmentDTO dto) {
         try {
-            // 数据验证
-            if (dto.getTemperature() < -50 || dto.getTemperature() > 50) {
-                throw new IllegalArgumentException("温度应在 -50℃ 到 50℃ 之间");
-            }
-            if (dto.getSoilFertility() < 0 || dto.getSoilFertility() > 100) {
-                throw new IllegalArgumentException("土壤肥力应在 0% 到 100% 之间");
-            }
-            if (dto.getPrecipitation() < 0) {
-                throw new IllegalArgumentException("降水量不能为负数");
-            }
-            if (dto.getTerrain() == null || dto.getTerrain().isEmpty()) {
-                throw new IllegalArgumentException("地形不能为空");
-            }
-            if (dto.getClimate() == null || dto.getClimate().isEmpty()) {
-                throw new IllegalArgumentException("气候不能为空");
-            }
-            if (dto.getAgriculturalTechnology() == null || dto.getAgriculturalTechnology().isEmpty()) {
-                throw new IllegalArgumentException("农业技术不能为空");
-            }
-
-            // 调用服务层保存数据
-            Long environmentId = environmentService.createEnvironment(dto);
+            Long environmentId = environmentService.createCustomEnvironment(dto);
             return ResponseEntity.ok(environmentId);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(-1L);

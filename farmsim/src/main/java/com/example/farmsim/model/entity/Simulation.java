@@ -17,6 +17,8 @@ public class Simulation {
     private String description;
     private String season;
     private LocalDate startDate;
+    private int timeScale;
+    private int simulationDays;// 时间流逝速率（1 分钟 = X 天）
 
     @Enumerated(EnumType.STRING)
     private SimulationStatus status;

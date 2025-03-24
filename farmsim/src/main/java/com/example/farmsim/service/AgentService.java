@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -355,6 +356,13 @@ public class AgentService {
         }
     }
 
+    private String parseAnimationType(String jsonCommand) {
+        // 示例解析逻辑
+        if(jsonCommand.contains("irrigate")) return "watering";
+        if(jsonCommand.contains("fertilize")) return "spreading";
+        return "default";
+    }
+
     public String startAutoDialogue(String simulationId) {
         try {
             // 1. 获取模拟的环境数据
@@ -598,15 +606,21 @@ public class AgentService {
         agentDialogueRepo.save(dialogue);
     }
 
+    @Transactional
     public void createAgent(String agentName, String simulationId) {
+        try {
         Agent agent = new Agent();
         agent.setAgentId("AGENT-" + System.currentTimeMillis());
+        agent.setAgentName(agentName);
         agent.setRoleType("FARMER");
-
-        // 随机生成能力值（0.3~0.7）
         agent.setPlantingSkill(0.3 + Math.random() * 0.4);
         agent.setLearningAbility(0.3 + Math.random() * 0.4);
         agent.setLocalKnowledge(0.3 + Math.random() * 0.4);
+
+        Simulation simulation = simulationRepo.findById(simulationId)
+                .orElseThrow(() -> new RuntimeException("模拟不存在: " + simulationId));
+        agent.setSimulation(simulation);
+
 
         // 根据本地知识确定可访问的数据类型
         List<String> accessibleData = new ArrayList<>();
@@ -615,7 +629,22 @@ public class AgentService {
         agent.setAccessibleData(accessibleData);
 
         agentRepo.save(agent);
+
+        Message message = new Message();
+        message.setType("agent-created");
+        message.setSimulationId(simulationId);
+        message.setData(Map.of(
+                "agentId", agent.getAgentId(),
+                "agentName", agent.getAgentName(),
+                "roleType", agent.getRoleType(),
+                "position", Map.of("x", 0, "y", 0, "z", 0) // 默认位置
+        ));
+        webSocketHandler.broadcastMessage(message);
+        } catch (Exception e) {
+            throw new RuntimeException("创建Agent失败: " + e.getMessage());
+        }
     }
+
 
     public Map<String, Object> getGlobalData(String simulationId) {
         Map<String, Object> data = new HashMap<>();
@@ -723,19 +752,24 @@ public class AgentService {
         System.out.println("分配作物 " + cropId + " 给农民 " + farmerId);
     }
 
+    // AgentService.java
     public void createAgronomist(String simulationId) {
         // 创建专家Agent
         Agent expert = new Agent();
         expert.setAgentId("EXPERT-" + System.currentTimeMillis());
+        expert.setAgentName("农业专家-" + (int)(Math.random() * 1000)); // 随机生成默认名称
         expert.setRoleType("AGRONOMIST");
         expert.setPlantingSkill(1.0);
         expert.setLearningAbility(1.0);
         expert.setLocalKnowledge(1.0);
         expert.setAccessibleData(List.of("temperature", "soil", "crops", "agents"));
-        agentRepo.save(expert);
 
-        // 调用资源分配优化
-        optimizeResourceAllocation(simulationId);
+        Simulation simulation = simulationRepo.findById(simulationId)
+                .orElseThrow(() -> new RuntimeException("模拟不存在: " + simulationId));
+        expert.setSimulation(simulation);
+
+        agentRepo.save(expert);
+        System.out.println("农业专家创建成功：" + expert.getAgentName());
     }
     public String makeDecision(String agentId, String prompt) {
         try {

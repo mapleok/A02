@@ -1,6 +1,5 @@
 /* 引入基础 CSS 文件，可包含全局的字体、颜色等基础样式设置 */
 @import './base.css';
-@import './global.css';
 
 /* 应用根元素的样式设置 */
 #app {
@@ -72,9 +71,9 @@
 /* 顶部导航栏中激活链接（当前页面对应的链接）的样式设置 */
 .top-nav-link.router-link-active {
   font-weight: bold;
-
   background-color: #f0f0f0;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--color-primary);
 }
 
 /* 侧边栏导航链接的样式设置 */
@@ -89,21 +88,6 @@
   transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
 
-/* 鼠标悬停在侧边栏导航链接上时的样式设置 */
-/*.sidebar-nav-link:hover {*/
-/*  background-color: transparent;*/
-/*  font-weight: bold;*/
-/*  transform: translateX(5px);*/
-/*}*/
-
-/*/* 侧边栏导航中激活链接（当前页面对应的链接）的样式设置 */
-/*.sidebar-nav-link.router-link-active {*/
-/*  font-weight: bold;*/
-/*  font-size: 18px;*/
-/*  background-color: #f8f8f8;*/
-/*  box-shadow: inset 2px 0 4px rgba(0, 0, 0, 0.05);*/
-/*}*/
-
 li.el-menu-item {
   color: #182716;
   font-size: 16px;
@@ -115,6 +99,35 @@ li.el-menu-item {
   background-color: #f9f9f9;
   padding: 30px;
 }
+
+/* global.css */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-main-container {
+  flex: 1;
+  display: flex;
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
 
 /* 响应式布局，当屏幕宽度小于等于 768px 时应用以下样式 */
 @media (max-width: 768px) {
@@ -150,22 +163,22 @@ li.el-menu-item {
   .main-content {
     padding: 15px;
   }
-
-  /* 修改 ElementPlus 图标（el-icon）的样式 */
-  .el-icon {
-    font-size: 20px;
-    color: #0071e3;
-  }
 }
 
-/* 修改 ElementPlus 图标（el-icon）的样式 */
-.el-icon {
-  font-size: 20px;
-  color: #0071e3;
-  transition: color 0.3s ease;
+/* 公共按钮样式 */
+.generate-button,
+.btn {
+  padding: 10px 20px;
+  background-color: #006400; /* 墨绿色按钮 */
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
 }
 
-/* 鼠标悬停在 ElementPlus 图标上时的样式设置 */
-.el-icon:hover {
-  color: #0056b3;
+.generate-button:hover,
+.btn:hover {
+  background-color: #004d00; /* 深一点的墨绿色悬停效果 */
 }
