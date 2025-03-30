@@ -32,7 +32,7 @@
   <!-- WebSocket 测试 -->
   <div class="section">
     <h2>WebSocket 测试</h2>
-    <button @click="connectWebSocket" class="generate-button">连接 WebSocket</button>
+    <button @click="connectWebSocket" class="generate-bzzzutton">连接 WebSocket</button>
     <div id="wsLog">{{ wsLog }}</div>
   </div>
   </div>

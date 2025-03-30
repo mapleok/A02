@@ -19,7 +19,6 @@
               <el-select v-model="agent1Count" placeholder="请选择">
                 <el-option
                   v-for="count in agentCountOptions"
-                  :key="count"
                   :label="count"
                   :value="count"
                 />

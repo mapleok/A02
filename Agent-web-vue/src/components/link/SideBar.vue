@@ -60,15 +60,15 @@
                 </span>
               </router-link>
             </el-menu-item>
-            <el-menu-item index="3-3">
-              <router-link to="/API_Page" class="sidebar-nav-link">
-                <span class="sidebar-icon-text">
-                  <!-- 使用 Font Awesome 的齿轮图标表示大模型调用 -->
-                  <i class="fas fa-cogs"></i>
-                  <span>大模型调用</span>
-                </span>
-              </router-link>
-            </el-menu-item>
+<!--            <el-menu-item index="3-3">-->
+<!--              <router-link to="/API_Page" class="sidebar-nav-link">-->
+<!--                <span class="sidebar-icon-text">-->
+<!--                  &lt;!&ndash; 使用 Font Awesome 的齿轮图标表示大模型调用 &ndash;&gt;-->
+<!--                  <i class="fas fa-cogs"></i>-->
+<!--                  <span>大模型调用</span>-->
+<!--                </span>-->
+<!--              </router-link>-->
+<!--            </el-menu-item>-->
           </el-menu-item-group>
         </el-sub-menu>
 

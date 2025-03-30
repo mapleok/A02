@@ -17,16 +17,18 @@
                 class="input-field"
               />
 <!--              <button @click="createScene" class="generate-button">创建场景</button>-->
-
             </div>
-            <label for="scene-name" class="input-label">描述</label>
-            <input
-              type="text"
-              id="scene-name"
-              v-model="sceneName"
-              placeholder="输入场景名称"
-              class="input-field"
-            />
+            <div class="input-group">
+              <label for="sim-desc" class="input-label">描述</label>
+              <input
+                type="text"
+                id="sim-desc"
+                v-model="simDesc"
+                placeholder="输入模拟描述"
+                class="input-field"
+              />
+            </div>
+            <pre>{{ simResult }}</pre>
             <div class="input-group">
               <label for="scene-select" class="input-label">选择场景</label>
               <select

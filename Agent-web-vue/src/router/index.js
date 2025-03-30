@@ -10,7 +10,7 @@ import Agentrole  from '../components/Agentrole.vue';
 
 // 模拟用户是否已登录的函数
 function isAuthenticated() {
-  // 这里可以根据实际情况判断用户是否已登录，例如检查本地存储中的 token
+  // 这里可以根据实际情况判断用户是否已登录，例如检查z本地存储中的 token
   return localStorage.getItem('token') !== null;
 }
 
