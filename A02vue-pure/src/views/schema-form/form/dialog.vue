@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-// https://plus-pro-components.com/components/dialog-form.html
-
+// 引入 PlusProComponents 的对话框表单组件样式
 import "plus-pro-components/es/components/dialog-form/style/css";
 import {
   type PlusColumn,
@@ -9,63 +8,22 @@ import {
   PlusDialogForm
 } from "plus-pro-components";
 
+// 定义表单列配置
 const columns: PlusColumn[] = [
   {
-    label: "Agent名称",
+    // 标签显示为 "模拟总描述"
+    label: "模拟描述",
+    width: 300, // 增加宽度以确保描述能在一行显示
+    prop: "environmentDefinition",
+    valueType: "input"
+    // tooltip: "请简要描述环境模拟的情况"
+  },
+  {
+    // 标签显示为 "Agent 角色"
+    label: "Agent ",
     width: 120,
-    prop: "name",
-    valueType: "copy",
-    tooltip: "名称最多显示6个字符"
-  },
-  {
-    label: "描述",
-    width: 120,
-    prop: "status",
-    valueType: "select",
-    options: [
-      {
-        label: "未解决",
-        value: "0",
-        color: "red"
-      },
-      {
-        label: "已解决",
-        value: "1",
-        color: "blue"
-      },
-      {
-        label: "解决中",
-        value: "2",
-        color: "yellow"
-      },
-      {
-        label: "失败",
-        value: "3",
-        color: "red"
-      }
-    ]
-  },
-  {
-    label: "是否显示",
-    width: 100,
-    prop: "switch",
-    valueType: "switch"
-  },
-
-  {
-    label: "时间",
-    prop: "time",
-    valueType: "date-picker"
-  },
-  {
-    label: "数量",
-    prop: "number",
-    valueType: "input-number",
-    fieldProps: { precision: 2, step: 2 }
-  },
-  {
-    label: "Agent",
-    prop: "city",
+    // 对应数据对象的属性名
+    prop: "role",
     valueType: "cascader",
     options: [
       {
@@ -78,7 +36,7 @@ const columns: PlusColumn[] = [
           },
           {
             value: "0-1",
-            label: "气象专家",
+            label: "气象专家"
           }
         ]
       },
@@ -109,88 +67,117 @@ const columns: PlusColumn[] = [
     ]
   },
   {
-    label: "地区",
-    prop: "place",
-    tooltip: "请精确到门牌号",
-    fieldProps: {
-      placeholder: "请精确到门牌号"
-    }
+    // 标签显示为 "姓名"
+    label: "姓名",
+    width: 120,
+    prop: "name",
+    valueType: "input"
+    // 提示信息
+    // tooltip: "请输入 Agent 的姓名"
   },
   {
-    label: "要求",
-    prop: "demand",
-    valueType: "checkbox",
-    options: [
-      {
-        label: "四六级",
-        value: "0"
-      },
-      {
-        label: "计算机二级证书",
-        value: "1"
-      },
-      {
-        label: "普通话证书",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "梦想",
-    prop: "gift",
-    valueType: "radio",
-    options: [
-      {
-        label: "诗",
-        value: "0"
-      },
-      {
-        label: "远方",
-        value: "1"
-      },
-      {
-        label: "美食",
-        value: "2"
-      }
-    ]
-  },
-  {
-    label: "到期时间",
-    prop: "endTime",
-    valueType: "date-picker",
-    fieldProps: {
-      type: "datetimerange",
-      startPlaceholder: "请选择开始时间",
-      endPlaceholder: "请选择结束时间"
-    }
-  },
-  {
-    label: "说明",
-    prop: "desc",
+    // 标签显示为 "角色描述"
+    label: "角色描述",
+    width: 120,
+    prop: "description",
     valueType: "textarea",
     fieldProps: {
-      maxlength: 10,
+      // 最大输入长度
+      maxlength: 200,
+      // 显示字数限制
       showWordLimit: true,
+      // 自动调整文本区域大小
       autosize: { minRows: 2, maxRows: 4 }
     }
+  },
+  {
+    // 标签显示为 "温度"
+    label: "温度",
+    prop: "temperature",
+    valueType: "input-number",
+    fieldProps: {
+      // 精度为 1 位小数
+      precision: 1,
+      // 步长为 0.5
+      step: 0.5
+    }
+  },
+  {
+    label: "农业技术",
+    prop: "arigiculture",
+    valueType: "select",
+    options: [
+      { value: '传统农业', label: '传统农业' },
+      { value: '精准农业', label: '精准农业' },
+      { value: '有机农业', label: '有机农业' },
+      { value: '智能农业', label: '智能农业' },
+    ]
+  },
+  {
+    label: "土壤肥力",
+    prop: "soil",
+    valueType: "select",
+    options: [
+      { value: '肥沃', label: '肥沃' },
+      { value: '中等', label: '中等' },
+      { value: '贫瘠', label: '贫瘠' },
+    ]
+  },
+  {
+    // 标签显示为 "气候情况"
+    label: "气候情况",
+    prop: "climate",
+    valueType: "select",
+    options: [
+      {
+        label: "温带季风气候",
+        value: "temperate_monsoon"
+      },
+      {
+        label: "热带雨林气候",
+        value: "tropical_rainforest"
+      },
+      {
+        label: "内陆干旱气候",
+        value: "inland_drought"
+      },
+      {
+        label: "温带海洋气候",
+        value: "temperate_marine"
+      }
+    ]
   }
 ];
 
+// 控制对话框是否显示的响应式变量
 const visible = ref(false);
+// 表单数据对象
 const values = ref<FieldValues>({});
 
+// 处理打开对话框的函数
 const handleOpen = () => {
   visible.value = true;
+};
+
+// 表单提交处理函数
+const handleSubmit = () => {
+  // 这里可以添加实际的表单数据提交逻辑，例如发送到后端接口
+  console.log('提交的表单数据:', values.value);
+  // 提交后关闭弹窗
+  visible.value = false;
 };
 </script>
 
 <template>
   <div>
-    <el-button @click="handleOpen">详细编辑</el-button>
+    <!-- 点击按钮触发 handleOpen 函数打开对话框 -->
+    <el-button @click="handleOpen">场景任务设计</el-button>
+    <!-- 对话框表单组件，绑定可见性和表单数据 -->
     <PlusDialogForm
       v-model:visible="visible"
       v-model="values"
       :form="{ columns }"
+      @submit="handleSubmit"
     />
   </div>
 </template>

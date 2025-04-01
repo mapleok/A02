@@ -6,6 +6,7 @@ export default {
   redirect: "/ganttastic/index",
   meta: {
     icon: "ri:bar-chart-horizontal-line",
+    showLink: false,
     title: $t("menus.pureGanttastic"),
     rank: ganttastic
   },

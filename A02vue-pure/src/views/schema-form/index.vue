@@ -16,17 +16,15 @@ function tabClick({ index }) {
 <template>
   <el-card shadow="never" :body-style="{ height: 'calc(100vh - 260px)' }">
     <template #header>
-      <span>
-        任务设计
-      </span>
+      <span>任务设计</span>
     </template>
     <el-tabs @tab-click="tabClick">
       <template v-for="(item, index) of list" :key="item.key">
         <el-tab-pane :lazy="true" v-if="index === 3">
           <!-- 渲染第4个示例的内容 -->
-            <component :is="item.component" />
-            <!-- 内嵌第2个示例的内容 -->
-            <component :is="list[1].component" />
+          <component :is="item.component" />Z
+          <!-- 内嵌第2个示例的内容 -->
+          <component :is="list[1].component" />
         </el-tab-pane>
       </template>
     </el-tabs>
@@ -48,6 +46,5 @@ function tabClick({ index }) {
 :deep(.el-tabs__nav-prev.is-disabled) {
   opacity: 0.5;
 }
-
 
 </style>
