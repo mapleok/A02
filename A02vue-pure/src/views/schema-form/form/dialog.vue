@@ -11,14 +11,6 @@ import {
 // 定义表单列配置
 const columns: PlusColumn[] = [
   {
-    // 标签显示为 "模拟总描述"
-    label: "模拟描述",
-    width: 300, // 增加宽度以确保描述能在一行显示
-    prop: "environmentDefinition",
-    valueType: "input"
-    // tooltip: "请简要描述环境模拟的情况"
-  },
-  {
     // 标签显示为 "Agent 角色"
     label: "Agent ",
     width: 120,

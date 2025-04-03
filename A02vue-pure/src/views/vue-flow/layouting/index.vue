@@ -107,10 +107,10 @@ async function layoutGraph(direction) {
           </button>
         </div>
 
-<!--       <div class="checkbox-panel">-->
-<!--          <label>Cancel on error</label>-->
-<!--          <input v-model="cancelOnError" type="checkbox" />-->
-<!--        </div>-->
+        <!--       <div class="checkbox-panel">-->
+        <!--          <label>Cancel on error</label>-->
+        <!--          <input v-model="cancelOnError" type="checkbox" />-->
+        <!--        </div>-->
       </Panel>
     </VueFlow>
   </div>

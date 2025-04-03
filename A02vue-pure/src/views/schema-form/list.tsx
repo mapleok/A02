@@ -17,7 +17,7 @@ export const list = [
   {
     key: "dialog",
     content: rendContent("dialog"),
-    title: "弹框表单",
+    title: "编辑场景",
     component: Dialog
   },
   {
